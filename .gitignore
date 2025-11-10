@@ -1,0 +1,18 @@
+# Binaries
+*.exe
+*.out
+*.test
+
+# Build
+/bin/
+/dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Config
+.env
+config.yaml
+
+draft.md

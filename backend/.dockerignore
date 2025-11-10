@@ -1,0 +1,50 @@
+# Игнорируем системные файлы
+.git
+.gitignore
+README.md
+*.md
+draft.md
+
+# Игнорируем файлы редакторов
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Игнорируем временные файлы и логи
+*.log
+*.tmp
+*.temp
+
+# Игнорируем бинарные файлы и артефакты сборки
+bin/
+dist/
+build/
+vendor/
+*.exe
+*.test
+
+# Игнорируем конфигурационные файлы
+.env
+.env.local
+.env.production
+# config.yaml
+
+# Игнорируем документацию и изображения
+docs/
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Игнорируеем Docker файлы
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Игнорируем специфичные для проекта папки
+generate-secret/
+cmd/generate-secret/
+
+# Игнорируем тестовые данные
+testdata/
