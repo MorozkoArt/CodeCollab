@@ -1,18 +1,29 @@
-# Binaries
+# Binaries for programs and plugins
 *.exe
-*.out
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with "go test -c"
 *.test
 
-# Build
-/bin/
-/dist/
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
 
-# IDE
-.vscode/
-.idea/
+# Dependency directories (remove the comment below to include it)
+vendor/
 
-# Config
+# Ide
+.idea
+.vscode
+
+# Env
 .env
-config.yaml
+
+# Bin
+bin
+
+ssl/
 
 draft.md

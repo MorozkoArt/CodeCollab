@@ -1,0 +1,70 @@
+services:
+
+  postgres:
+    image: ghcr.io/morozkoart/codecollab/postgres:latest
+    container_name: codecollab-db
+    env_file:
+      - .env
+    ports: []
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+  migrations:
+    image: ghcr.io/morozkoart/codecollab/migrations:latest
+    container_name: codecollab-migrations
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - codecollab-network
+    command: up --allow-missing
+    restart: "no"
+
+  backend:
+    image: ghcr.io/morozkoart/codecollab/backend:latest
+    container_name: codecollab-backend
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+  nginx:
+    image: ghcr.io/morozkoart/codecollab/nginx:latest
+    container_name: codecollab-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: codecollab-postgres-data
+
+networks:
+  codecollab-network:
+    name: codecollab-network
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: br-codecollab
