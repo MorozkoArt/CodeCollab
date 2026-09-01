@@ -12,6 +12,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags='-w -s' -o main ./cmd/server
 
+RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
 FROM alpine:latest
 
@@ -22,9 +23,9 @@ RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
 
 COPY --from=builder /app/main .
-# COPY --from=builder /go/bin/goose /usr/local/bin/goose
-# COPY --from=builder /app/config.yaml .
-# COPY --from=builder /app/internal/db/migrations ./internal/db/migrations
+COPY --from=builder /go/bin/goose /usr/local/bin/goose
+COPY --from=builder /app/config.yaml .
+COPY --from=builder /app/internal/db/migrations ./internal/db/migrations
 
 RUN chown -R app:app /app
 

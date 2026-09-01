@@ -1,0 +1,13 @@
+server:
+  port: 8080
+  host: "0.0.0.0"
+
+database:
+  host: localhost
+  port: 5432
+  sslmode: disable
+
+auth:
+  token_expiry: 24h
+
+appenv: development

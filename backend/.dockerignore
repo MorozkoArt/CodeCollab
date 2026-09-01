@@ -28,7 +28,7 @@ vendor/
 .env
 .env.local
 .env.production
-# config.yaml
+#config.yaml
 
 # Игнорируем документацию и изображения
 docs/
