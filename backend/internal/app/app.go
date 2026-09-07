@@ -6,12 +6,17 @@ import (
 	"net/http"
 	"time"
 
+	httpmiddleware "github.com/MorozkoArt/CodeCollab/internal/api/http/middleware"
 	"github.com/MorozkoArt/CodeCollab/internal/config"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
+)
 
-	httpmiddleware "github.com/MorozkoArt/CodeCollab/internal/api/http/middleware"
+const (
+	readTimeout  = 5 * time.Second
+	writeTimeout = 10 * time.Second
+	idleTimeout  = 60 * time.Second
 )
 
 type App struct {
@@ -30,9 +35,9 @@ func New(cfg *config.ServerConfig, handler func(chi.Router)) *App {
 		server: &http.Server{
 			Addr:         fmt.Sprintf("%s:%d", cfg.Host(), cfg.Port()),
 			Handler:      r,
-			ReadTimeout:  5 * time.Second,
-			WriteTimeout: 10 * time.Second,
-			IdleTimeout:  60 * time.Second,
+			ReadTimeout:  readTimeout,
+			WriteTimeout: writeTimeout,
+			IdleTimeout:  idleTimeout,
 		},
 	}
 }
