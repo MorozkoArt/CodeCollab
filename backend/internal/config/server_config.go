@@ -9,8 +9,8 @@ type ServerConfig struct {
 
 func NewServerConfig() *ServerConfig {
 	return &ServerConfig{
-		port: env.GetInt("SERVER_PORT", 8080),
-		host: env.Get("SERVER_HOST", "0.0.0.0"),
+		port: env.GetInt("SERVER_PORT", defaultServerPort),
+		host: env.Get("SERVER_HOST", defaultServerHost),
 	}
 }
 

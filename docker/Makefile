@@ -1,21 +1,27 @@
-# Подгружаем .env из корня
-ifneq ("$(wildcard .env)","")
-    include .env
+# Подгружаем .env из корня монорепо
+ifneq ("$(wildcard ../.env)","")
+    include ../.env
     export
 endif
 
 DOCKER_COMPOSE := docker compose
 
+ifeq ($(OS),Windows_NT)
+    NULL_DEVICE := NUL
+else
+    NULL_DEVICE := /dev/null
+endif
+
 # Проверяем доступность docker compose
-ifeq (, $(shell $(DOCKER_COMPOSE) version 2> /dev/null))
+ifeq (, $(shell $(DOCKER_COMPOSE) version 2>$(NULL_DEVICE)))
     DOCKER_COMPOSE := docker-compose
-    ifeq (, $(shell $(DOCKER_COMPOSE) --version 2> /dev/null))
+    ifeq (, $(shell $(DOCKER_COMPOSE) --version 2>$(NULL_DEVICE)))
         $(error "Neither 'docker compose' nor 'docker-compose' found in PATH")
     endif
 endif
 
-DEV_COMPOSE  := docker/dev/docker-compose.yml
-PROD_COMPOSE := docker/prod/docker-compose.yml
+DEV_COMPOSE  := dev/docker-compose.yml
+PROD_COMPOSE := prod/docker-compose.yml
 
 # Dev
 up:
@@ -40,6 +46,9 @@ up-backend:
 up-migrations:
 	$(DOCKER_COMPOSE) -f $(DEV_COMPOSE) up --build migrations
 
+up-nginx:
+	$(DOCKER_COMPOSE) -f $(DEV_COMPOSE) up --detach --build nginx
+
 # Prod
 prod-up:
 	$(DOCKER_COMPOSE) -f $(PROD_COMPOSE) pull
@@ -51,27 +60,5 @@ prod-down:
 prod-logs:
 	$(DOCKER_COMPOSE) -f $(PROD_COMPOSE) logs -f
 
-# backend/Makefile
-lint:
-	$(MAKE) -C backend lint
-
-lint-fix:
-	$(MAKE) -C backend lint-fix
-
-test:
-	$(MAKE) -C backend test
-
-vendor:
-	$(MAKE) -C backend vendor
-
-install-deps:
-	$(MAKE) -C backend install-deps
-
-m_up:
-	$(MAKE) -C backend m_up
-
-m_down:
-	$(MAKE) -C backend m_down
-
-m_create:
-	$(MAKE) -C backend m_create m_name=$(m_name)
+prod-ps:
+	$(DOCKER_COMPOSE) -f $(PROD_COMPOSE) ps
