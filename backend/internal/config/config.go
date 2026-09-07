@@ -1,12 +1,10 @@
 package config
 
-import "github.com/MorozkoArt/CodeCollab/pkg/env"
-
 type Config struct {
 	*ServerConfig
 	*DBConfig
 	*AuthConfig
-	AppEnv string
+	*AppConfig
 }
 
 func NewConfig() *Config {
@@ -14,6 +12,6 @@ func NewConfig() *Config {
 		ServerConfig: NewServerConfig(),
 		DBConfig:     NewDBConfig(),
 		AuthConfig:   NewAuthConfig(),
-		AppEnv:       env.Get("APP_ENV", "development"),
+		AppConfig:    NewAppConfig(),
 	}
 }

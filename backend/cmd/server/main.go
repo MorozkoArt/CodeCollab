@@ -1,12 +1,3 @@
-// @title           CodeCollab API
-// @version         1.0
-// @description     Collaborative code editor platform API
-// @host            localhost
-// @schemes         https
-// @BasePath        /api/v1
-// @securityDefinitions.apikey BearerAuth
-// @in              header
-// @name            Authorization
 package main
 
 import (
@@ -19,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/MorozkoArt/CodeCollab/docs" // swagger docs
+	_ "github.com/MorozkoArt/CodeCollab/docs"
 	v1 "github.com/MorozkoArt/CodeCollab/internal/api/http/v1"
 	"github.com/MorozkoArt/CodeCollab/internal/app"
 	"github.com/MorozkoArt/CodeCollab/internal/config"
@@ -33,9 +24,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const (
+	envFileFlag     = "WITH_ENV_FILE"
+	envFileFlagOff  = "0"
+	shutdownTimeout = 10 * time.Second
+)
+
 func init() {
-	// В контейнере WITH_ENV_FILE=0 — читаем переменные из ОС напрямую
-	if os.Getenv("WITH_ENV_FILE") != "0" {
+	if os.Getenv(envFileFlag) != envFileFlagOff {
 		if err := godotenv.Load(); err != nil {
 			log.Info().Msg("No .env file found, using system env")
 		}
@@ -51,31 +47,27 @@ func main() {
 func run() error {
 	cfg := config.NewConfig()
 
-	logger.Init(cfg.AppEnv)
+	logger.Init(cfg.AppConfig.AppEnv)
 
-	log.Info().Str("env", cfg.AppEnv).Msg("Starting CodeCollab")
+	log.Info().Str("env", cfg.AppConfig.AppEnv).Msg("Starting CodeCollab")
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	// БД
 	pool, err := db.NewPostgresDB(ctx, cfg.DBConfig)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer pool.Close()
 
-	// Слои
 	userRepo := repository.NewUserRepository(pool)
 	jwtSvc := jwtpkg.NewService(cfg.JWTSecret(), cfg.TokenExpiry())
 	authSvc := services.NewAuthService(userRepo, jwtSvc)
 
-	// HTTP сервер
 	httpApp := app.New(cfg.ServerConfig, func(r chi.Router) {
 		v1.Register(r, authSvc, jwtSvc)
 	})
 
-	// Запуск в горутине
 	go func() {
 		if err := httpApp.Run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Error().Err(err).Msg("HTTP server error")
@@ -83,12 +75,11 @@ func run() error {
 		}
 	}()
 
-	// Ждём сигнала завершения
 	<-ctx.Done()
 
 	log.Info().Msg("Shutting down gracefully...")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer cancel()
 
 	if err := httpApp.Stop(shutdownCtx); err != nil {
