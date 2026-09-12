@@ -4,7 +4,7 @@ services:
     image: ghcr.io/morozkoart/codecollab/postgres:latest
     container_name: codecollab-db
     env_file:
-      - .env
+      - ../../.env
     ports: []
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -21,7 +21,7 @@ services:
     image: ghcr.io/morozkoart/codecollab/migrations:latest
     container_name: codecollab-migrations
     env_file:
-      - .env
+      - ../../.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,7 +34,7 @@ services:
     image: ghcr.io/morozkoart/codecollab/backend:latest
     container_name: codecollab-backend
     env_file:
-      - .env
+      - ../../.env
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,7 +51,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./ssl:/etc/nginx/ssl:ro
+      - ../../nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - backend
     networks:

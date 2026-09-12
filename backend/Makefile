@@ -9,11 +9,18 @@ MIGRATIONS_DIR := db/migrations
 
 GOOSE_DBSTRING_LOCAL := postgresql://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
 
-# Зависимости
+ifeq ($(OS),Windows_NT)
+    SET_GOBIN    = set "GOBIN=$(LOCAL_BIN)" &&
+    SET_TEST_DB  = set "TEST_DB_HOST=localhost" &&
+else
+    SET_GOBIN    = GOBIN=$(LOCAL_BIN)
+    SET_TEST_DB  = TEST_DB_HOST=localhost
+endif
+
 install-deps:
-	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10.1
-	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.24.1
-	GOBIN=$(LOCAL_BIN) go install github.com/swaggo/swag/cmd/swag@latest
+	$(SET_GOBIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.13.2
+	$(SET_GOBIN) go install github.com/pressly/goose/v3/cmd/goose@v3.24.1
+	$(SET_GOBIN) go install github.com/swaggo/swag/cmd/swag@latest
 
 # Vendor
 vendor:
@@ -48,10 +55,14 @@ lint-fix:
 
 # Тесты
 test:
-	go test -cover -v -race ./internal/...
+	$(SET_TEST_DB) go test -cover -v -race ./internal/... ./pkg/...
 
 test-short:
-	go test -short ./internal/...
+	$(SET_TEST_DB) go test -short ./internal/... ./pkg/...
+
+test-cover:
+	$(SET_TEST_DB) go test -coverprofile=coverage.out ./internal/... ./pkg/...
+	go tool cover -html=coverage.out
 
 # Генерация swagger документации
 swagger:
