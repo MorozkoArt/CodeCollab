@@ -66,7 +66,7 @@ func TestRegister(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("user exists → 409", func(t *testing.T) {
+	t.Run("user exists: 409", func(t *testing.T) {
 		mockRepo := new(repository.MockUserRepository)
 		mockRepo.On("Create", mock.Anything, mock.Anything).Return(repository.ErrUserExists)
 
@@ -82,7 +82,7 @@ func TestRegister(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("invalid body → 400", func(t *testing.T) {
+	t.Run("invalid body: 400", func(t *testing.T) {
 		mockRepo := new(repository.MockUserRepository)
 		w := postRequest(t, newTestRouter(mockRepo), routeRegister, []byte("bad json"))
 		assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -117,7 +117,7 @@ func TestLogin(t *testing.T) {
 		mockRepo.AssertExpectations(t)
 	})
 
-	t.Run("wrong password → 401", func(t *testing.T) {
+	t.Run("wrong password: 401", func(t *testing.T) {
 		hashed, err := password.Hash("correct_password")
 		require.NoError(t, err)
 
