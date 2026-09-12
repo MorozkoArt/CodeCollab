@@ -10,9 +10,11 @@ MIGRATIONS_DIR := db/migrations
 GOOSE_DBSTRING_LOCAL := postgresql://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
 
 ifeq ($(OS),Windows_NT)
-    SET_GOBIN = set "GOBIN=$(LOCAL_BIN)" &&
+    SET_GOBIN    = set "GOBIN=$(LOCAL_BIN)" &&
+    SET_TEST_DB  = set "TEST_DB_HOST=localhost" &&
 else
-    SET_GOBIN = GOBIN=$(LOCAL_BIN)
+    SET_GOBIN    = GOBIN=$(LOCAL_BIN)
+    SET_TEST_DB  = TEST_DB_HOST=localhost
 endif
 
 install-deps:
@@ -53,10 +55,14 @@ lint-fix:
 
 # Тесты
 test:
-	go test -cover -v -race ./internal/...
+	$(SET_TEST_DB) go test -cover -v -race ./internal/... ./pkg/...
 
 test-short:
-	go test -short ./internal/...
+	$(SET_TEST_DB) go test -short ./internal/... ./pkg/...
+
+test-cover:
+	$(SET_TEST_DB) go test -coverprofile=coverage.out ./internal/... ./pkg/...
+	go tool cover -html=coverage.out
 
 # Генерация swagger документации
 swagger:

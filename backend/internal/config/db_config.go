@@ -18,8 +18,13 @@ type DBConfig struct {
 }
 
 func NewDBConfig() *DBConfig {
+	host := env.Get("TEST_DB_HOST", "")
+	if host == "" {
+		host = env.Get("DB_HOST", defaultDBHost)
+	}
+
 	return &DBConfig{
-		host:     env.Get("DB_HOST", defaultDBHost),
+		host:     host,
 		port:     env.GetInt("POSTGRES_PORT", defaultDBPort),
 		user:     env.Get("POSTGRES_USER", defaultDBUser),
 		password: env.Get("POSTGRES_PASSWORD", ""),

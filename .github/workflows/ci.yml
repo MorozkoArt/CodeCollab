@@ -25,7 +25,7 @@ jobs:
 
   # 2. Тесты
   test:
-    name: Test
+    name: Tests
     runs-on: ubuntu-latest
 
     services:
@@ -34,7 +34,7 @@ jobs:
         env:
           POSTGRES_USER: test_user
           POSTGRES_PASSWORD: test_password
-          POSTGRES_DB: codecollab_test
+          POSTGRES_DB: codecollab
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -58,22 +58,22 @@ jobs:
           goose \
             -dir backend/db/migrations \
             postgres \
-            "postgresql://test_user:test_password@localhost:5432/codecollab_test?sslmode=disable" \
+            "postgresql://test_user:test_password@localhost:5432/codecollab?sslmode=disable" \
             up
 
       - name: Run tests
         working-directory: backend
         env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USER: test_user
-          DB_PASSWORD: test_password
-          DB_NAME: codecollab_test
+          TEST_DB_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: codecollab
           DB_SSLMODE: disable
           JWT_SECRET: ci_test_secret_key
           JWT_EXPIRY: 24h
           SERVER_PORT: 8080
-        run: go test -v -race -cover ./internal/...
+        run: go test -v -race -cover ./internal/... ./pkg/...
 
   # 3. Build & Push
   build-and-push:
@@ -92,13 +92,10 @@ jobs:
         include:
           - name: backend
             dockerfile: docker/backend/Dockerfile
-
           - name: migrations
             dockerfile: docker/migrations/Dockerfile
-
           - name: postgres
             dockerfile: docker/postgres/Dockerfile
-
           - name: nginx
             dockerfile: docker/nginx/Dockerfile
 

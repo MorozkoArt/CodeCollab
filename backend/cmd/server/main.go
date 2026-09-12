@@ -1,3 +1,12 @@
+// @title           CodeCollab API
+// @version         1.0
+// @description     Collaborative code editor platform API
+// @host            localhost
+// @schemes         https
+// @BasePath        /api/v1
+// @securityDefinitions.apikey BearerAuth
+// @in              header
+// @name            Authorization
 package main
 
 import (
