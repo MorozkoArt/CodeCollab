@@ -7,9 +7,11 @@ import (
 	"github.com/MorozkoArt/CodeCollab/internal/domain"
 	"github.com/MorozkoArt/CodeCollab/internal/repository"
 	"github.com/MorozkoArt/CodeCollab/pkg/jwt"
+	"github.com/MorozkoArt/CodeCollab/pkg/password"
 	"github.com/rs/zerolog/log"
-	"golang.org/x/crypto/bcrypt"
 )
+
+var errInvalidCredentials = errors.New("invalid credentials")
 
 type AuthService struct {
 	userRepo   repository.UserRepository
@@ -26,13 +28,11 @@ func NewAuthService(userRepo repository.UserRepository, jwtService *jwt.Service)
 func (s *AuthService) Register(ctx context.Context, req *domain.RegisterRequest) error {
 	log.Info().Ctx(ctx).Str("email", req.Email).Msg("Registering user")
 
-	user := &domain.User{
+	return s.userRepo.Create(ctx, &domain.User{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: req.Password,
-	}
-
-	return s.userRepo.Create(ctx, user)
+	})
 }
 
 func (s *AuthService) Login(ctx context.Context, req *domain.LoginRequest) (*domain.UserResponse, string, error) {
@@ -41,12 +41,12 @@ func (s *AuthService) Login(ctx context.Context, req *domain.LoginRequest) (*dom
 	user, err := s.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
 		log.Warn().Ctx(ctx).Str("email", req.Email).Msg("Login failed: user not found")
-		return nil, "", errors.New("invalid credentials")
+		return nil, "", errInvalidCredentials
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+	if !password.Check(req.Password, user.Password) {
 		log.Warn().Ctx(ctx).Str("email", req.Email).Msg("Login failed: invalid password")
-		return nil, "", errors.New("invalid credentials")
+		return nil, "", errInvalidCredentials
 	}
 
 	token, err := s.jwtService.GenerateToken(user.ID, user.Email)

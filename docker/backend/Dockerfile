@@ -1,4 +1,4 @@
-FROM golang:1.25.4-alpine AS builder
+FROM golang:1.27.0-alpine AS builder
 
 RUN apk add --no-cache build-base
 
@@ -15,7 +15,7 @@ RUN CGO_ENABLED=0 GOOS=linux \
     -ldflags="-s -w -X main.version=${VERSION}" \
     -o codecollab ./cmd/server/main.go
 
-FROM alpine:3.19
+FROM alpine:3.21
 
 RUN apk add --no-cache ca-certificates tzdata
 
