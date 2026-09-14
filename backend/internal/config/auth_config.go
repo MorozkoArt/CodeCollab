@@ -14,7 +14,7 @@ type AuthConfig struct {
 func NewAuthConfig() *AuthConfig {
 	return &AuthConfig{
 		jwtSecret:   env.Get("JWT_SECRET", ""),
-		tokenExpiry: env.GetDuration("JWT_EXPIRY", 24*time.Hour),
+		tokenExpiry: env.GetDuration("JWT_EXPIRY", defaultTokenExpiry),
 	}
 }
 
