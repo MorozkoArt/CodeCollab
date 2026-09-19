@@ -1,0 +1,32 @@
+name: codecollab-auth
+
+services:
+  migrations:
+    image: ghcr.io/morozkoart/codecollab/auth-migrations:latest
+    container_name: codecollab-auth-migrations
+    env_file:
+      - ../../.env
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=host=${POSTGRES_HOST} port=${POSTGRES_PORT} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=${POSTGRES_SSLMODE}
+    networks:
+      - codecollab-network
+    command: up --allow-missing
+    restart: "no"
+
+  auth:
+    image: ghcr.io/morozkoart/codecollab/auth:latest
+    container_name: codecollab-auth
+    env_file:
+      - ../../.env
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+networks:
+  codecollab-network:
+    external: true
+    name: codecollab-network

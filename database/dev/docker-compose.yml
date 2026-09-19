@@ -1,0 +1,29 @@
+name: codecollab-db-dev
+
+services:
+  postgres:
+    build:
+      context: ..
+      dockerfile: db/Dockerfile
+    container_name: codecollab-db-dev
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    command: [ "postgres", "-p", "${POSTGRES_PORT}" ]
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data_dev:
+    name: codecollab-postgres-dev
+
+networks:
+  codecollab-network:
+    name: codecollab-network
+    driver: bridge

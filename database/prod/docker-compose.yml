@@ -1,0 +1,28 @@
+name: codecollab-db
+
+services:
+  postgres:
+    image: ghcr.io/morozkoart/codecollab/postgres:latest
+    container_name: codecollab-db
+    env_file:
+      - ../.env
+    ports: []
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    name: codecollab-postgres-data
+
+networks:
+  codecollab-network:
+    name: codecollab-network
+    driver: bridge

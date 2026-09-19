@@ -1,0 +1,36 @@
+name: codecollab-auth-dev
+
+services:
+  migrations:
+    build:
+      context: ../../../..
+      dockerfile: services/auth/docker/migrations/Dockerfile
+    container_name: codecollab-auth-migrations-dev
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=host=${POSTGRES_HOST} port=${POSTGRES_PORT} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=${POSTGRES_SSLMODE}
+    networks:
+      - codecollab-network
+    restart: "no"
+
+  auth:
+    build:
+      context: ../../../..
+      dockerfile: services/auth/docker/auth/Dockerfile
+    container_name: codecollab-auth-dev
+    env_file:
+      - ../../.env
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+networks:
+  codecollab-network:
+    external: true
+    name: codecollab-network

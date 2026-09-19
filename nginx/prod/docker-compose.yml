@@ -1,0 +1,19 @@
+name: codecollab-nginx
+
+services:
+  nginx:
+    image: ghcr.io/morozkoart/codecollab/nginx:latest
+    container_name: codecollab-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../ssl:/etc/nginx/ssl:ro
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+networks:
+  codecollab-network:
+    external: true
+    name: codecollab-network
