@@ -1,3 +1,8 @@
+ifneq ("$(wildcard .env)","")
+    include .env
+    export
+endif
+
 DOCKER_COMPOSE := docker compose
 
 ifeq ($(OS),Windows_NT)

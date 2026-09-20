@@ -6,6 +6,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 80 443
+EXPOSE ${NGINX_HTTP_PORT} ${NGINX_HTTPS_PORT}
 
 CMD ["nginx", "-g", "daemon off;"]

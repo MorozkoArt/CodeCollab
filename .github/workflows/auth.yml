@@ -1,15 +1,22 @@
-name: CI
+name: Auth CI
 
 on:
   push:
+    paths:
+      - 'services/auth/**'
+      - 'pkg/**'
+      - '.github/workflows/auth.yml'
   pull_request:
+    paths:
+      - 'services/auth/**'
+      - 'pkg/**'
+      - '.github/workflows/auth.yml'
 
 env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/codecollab
 
 jobs:
-  # 1. Линтер
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -23,7 +30,6 @@ jobs:
           working-directory: services/auth
           args: --config=./.golangci.yml --timeout=5m
 
-  # 2. Тесты
   test:
     name: Tests
     runs-on: ubuntu-latest
@@ -69,13 +75,12 @@ jobs:
           POSTGRES_USER: test_user
           POSTGRES_PASSWORD: test_password
           POSTGRES_DB: codecollab
-          DB_SSLMODE: disable
+          POSTGRES_SSLMODE: disable
           JWT_SECRET: ci_test_secret_key
           JWT_EXPIRY: 24h
           SERVER_PORT: 8080
         run: go test -v -race -cover ./internal/...
 
-  # 3. Build & Push
   build-and-push:
     name: Build & Push
     runs-on: ubuntu-latest
@@ -88,16 +93,13 @@ jobs:
       packages: write
 
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - name: backend
-            dockerfile: docker/backend/Dockerfile
-          - name: migrations
-            dockerfile: docker/migrations/Dockerfile
-          - name: postgres
-            dockerfile: docker/postgres/Dockerfile
-          - name: nginx
-            dockerfile: docker/nginx/Dockerfile
+          - name: auth
+            dockerfile: services/auth/docker/auth/Dockerfile
+          - name: auth-migrations
+            dockerfile: services/auth/docker/migrations/Dockerfile
 
     steps:
       - uses: actions/checkout@v4
@@ -112,18 +114,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker meta — ${{ matrix.name }}
+      - name: Docker meta - ${{ matrix.name }}
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_PREFIX }}/${{ matrix.name }}
           tags: |
             type=sha,prefix=sha-,format=short
-            type=ref,event=branch
-            type=ref,event=tag
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
+            type=raw,value=latest
 
-      - name: Build & push — ${{ matrix.name }}
+      - name: Build & push - ${{ matrix.name }}
         uses: docker/build-push-action@v5
         with:
           context: .

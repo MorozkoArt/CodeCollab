@@ -5,13 +5,12 @@ services:
     image: ghcr.io/morozkoart/codecollab/nginx:latest
     container_name: codecollab-nginx
     ports:
-      - "80:80"
-      - "443:443"
+      - "${NGINX_HTTP_PORT}:${NGINX_HTTP_PORT}"
+      - "${NGINX_HTTPS_PORT}:${NGINX_HTTPS_PORT}"
     volumes:
       - ../ssl:/etc/nginx/ssl:ro
     networks:
       - codecollab-network
-    restart: unless-stopped
 
 networks:
   codecollab-network:

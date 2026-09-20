@@ -17,7 +17,6 @@ services:
       - postgres_data_dev:/var/lib/postgresql/data
     networks:
       - codecollab-network
-    restart: unless-stopped
 
 volumes:
   postgres_data_dev:

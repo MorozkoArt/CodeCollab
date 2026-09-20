@@ -4,19 +4,17 @@ services:
   postgres:
     image: ghcr.io/morozkoart/codecollab/postgres:latest
     container_name: codecollab-db
-    env_file:
-      - ../.env
-    ports: []
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    command: ["postgres", "-p", "${POSTGRES_PORT}"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
     networks:
       - codecollab-network
-    restart: unless-stopped
 
 volumes:
   postgres_data:

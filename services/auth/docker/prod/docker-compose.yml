@@ -12,18 +12,24 @@ services:
     networks:
       - codecollab-network
     command: up --allow-missing
-    restart: "no"
 
   auth:
     image: ghcr.io/morozkoart/codecollab/auth:latest
     container_name: codecollab-auth
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    environment:
+      # переменная для го приложения, го приложение берет env переменные напрямую из ОС, без env файла,
+      # env файл передаем только в контейнер, чтобы записать переменные в ОС
+      - "WITH_ENV_FILE=0"
     env_file:
       - ../../.env
+    networks:
+      - codecollab-network
     depends_on:
       migrations:
         condition: service_completed_successfully
-    networks:
-      - codecollab-network
     restart: unless-stopped
 
 networks:
