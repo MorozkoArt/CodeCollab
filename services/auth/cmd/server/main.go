@@ -19,14 +19,14 @@ import (
 	"syscall"
 	"time"
 
+	pkgdb "github.com/MorozkoArt/CodeCollab/pkg/db"
 	jwtpkg "github.com/MorozkoArt/CodeCollab/pkg/jwt"
 	"github.com/MorozkoArt/CodeCollab/pkg/logger"
+	"github.com/MorozkoArt/CodeCollab/services/auth/config"
 	_ "github.com/MorozkoArt/CodeCollab/services/auth/docs"
 	v1 "github.com/MorozkoArt/CodeCollab/services/auth/internal/api/http/v1"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/app"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/config"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/db"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repository"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -56,24 +56,24 @@ func main() {
 func run() error {
 	cfg := config.NewConfig()
 
-	logger.Init(cfg.AppConfig.AppEnv)
+	logger.Init(cfg.App.AppEnv)
 
-	log.Info().Str("env", cfg.AppConfig.AppEnv).Msg("Starting CodeCollab")
+	log.Info().Str("env", cfg.App.AppEnv).Msg("Starting CodeCollab")
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	pool, err := db.NewPostgresDB(ctx, cfg.DBConfig)
+	dbClient, err := pkgdb.NewDBClient(ctx, cfg.DB)
 	if err != nil {
-		return fmt.Errorf("failed to connect to database: %w", err)
+		return fmt.Errorf("init db client: %w", err)
 	}
-	defer pool.Close()
+	defer dbClient.Close()
+	userRepo := repo.NewUserRepository(dbClient.SQL(), dbClient.Builder())
 
-	userRepo := repository.NewUserRepository(pool)
 	jwtSvc := jwtpkg.NewService(cfg.JWTSecret(), cfg.TokenExpiry())
 	authSvc := services.NewAuthService(userRepo, jwtSvc)
 
-	httpApp := app.New(cfg.ServerConfig, func(r chi.Router) {
+	httpApp := app.New(cfg.Server, func(r chi.Router) {
 		v1.Register(r, authSvc, jwtSvc)
 	})
 

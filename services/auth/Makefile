@@ -14,11 +14,9 @@ GOOSE_DBSTRING_LOCAL := postgresql://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PO
 
 ifeq ($(OS),Windows_NT)
     SET_GOBIN   := set "GOBIN=$(LOCAL_BIN)" &&
-    SET_TEST_DB := set "TEST_DB_HOST=localhost" &&
     NULL_DEVICE := NUL
 else
     SET_GOBIN   := GOBIN=$(LOCAL_BIN)
-    SET_TEST_DB := TEST_DB_HOST=localhost
     NULL_DEVICE := /dev/null
 endif
 
@@ -69,13 +67,13 @@ lint-fix:
 
 # Тесты
 test:
-	$(SET_TEST_DB) go test -cover -v -race ./internal/...
+	go test -cover -v -race ./internal/...
 
 test-short:
-	$(SET_TEST_DB) go test -short ./internal/...
+	go test -short ./internal/...
 
 test-cover:
-	$(SET_TEST_DB) go test -coverprofile=coverage.out ./internal/...
+	go test -coverprofile=coverage.out ./internal/...
 	go tool cover -html=coverage.out
 
 # swagger

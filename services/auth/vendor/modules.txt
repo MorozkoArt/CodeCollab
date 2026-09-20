@@ -1,8 +1,12 @@
 # github.com/KyleBanks/depth v1.2.1
 ## explicit
 github.com/KyleBanks/depth
+# github.com/Masterminds/squirrel v1.5.4
+## explicit; go 1.14
+github.com/Masterminds/squirrel
 # github.com/MorozkoArt/CodeCollab/pkg v0.0.0-00010101000000-000000000000 => ../../pkg
 ## explicit; go 1.27.0
+github.com/MorozkoArt/CodeCollab/pkg/db
 github.com/MorozkoArt/CodeCollab/pkg/env
 github.com/MorozkoArt/CodeCollab/pkg/jwt
 github.com/MorozkoArt/CodeCollab/pkg/logger
@@ -20,6 +24,10 @@ github.com/gabriel-vasile/mimetype/internal/json
 github.com/gabriel-vasile/mimetype/internal/magic
 github.com/gabriel-vasile/mimetype/internal/markup
 github.com/gabriel-vasile/mimetype/internal/scan
+# github.com/georgysavva/scany v1.2.3
+## explicit; go 1.14
+github.com/georgysavva/scany/dbscan
+github.com/georgysavva/scany/pgxscan
 # github.com/go-chi/chi/v5 v5.2.3
 ## explicit; go 1.20
 github.com/go-chi/chi/v5
@@ -50,29 +58,37 @@ github.com/go-playground/validator/v10
 # github.com/golang-jwt/jwt/v5 v5.3.1
 ## explicit; go 1.21
 github.com/golang-jwt/jwt/v5
+# github.com/jackc/chunkreader/v2 v2.0.1
+## explicit; go 1.12
+github.com/jackc/chunkreader/v2
+# github.com/jackc/pgconn v1.14.3
+## explicit; go 1.17
+github.com/jackc/pgconn
+github.com/jackc/pgconn/internal/ctxwatch
+github.com/jackc/pgconn/stmtcache
+# github.com/jackc/pgio v1.0.0
+## explicit; go 1.12
+github.com/jackc/pgio
 # github.com/jackc/pgpassfile v1.0.0
 ## explicit; go 1.12
 github.com/jackc/pgpassfile
+# github.com/jackc/pgproto3/v2 v2.3.3
+## explicit; go 1.12
+github.com/jackc/pgproto3/v2
 # github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761
 ## explicit; go 1.14
 github.com/jackc/pgservicefile
-# github.com/jackc/pgx/v5 v5.7.6
-## explicit; go 1.23.0
-github.com/jackc/pgx/v5
-github.com/jackc/pgx/v5/internal/iobufpool
-github.com/jackc/pgx/v5/internal/pgio
-github.com/jackc/pgx/v5/internal/sanitize
-github.com/jackc/pgx/v5/internal/stmtcache
-github.com/jackc/pgx/v5/pgconn
-github.com/jackc/pgx/v5/pgconn/ctxwatch
-github.com/jackc/pgx/v5/pgconn/internal/bgreader
-github.com/jackc/pgx/v5/pgproto3
-github.com/jackc/pgx/v5/pgtype
-github.com/jackc/pgx/v5/pgxpool
-# github.com/jackc/puddle/v2 v2.2.2
-## explicit; go 1.19
-github.com/jackc/puddle/v2
-github.com/jackc/puddle/v2/internal/genstack
+# github.com/jackc/pgtype v1.14.0
+## explicit; go 1.13
+github.com/jackc/pgtype
+# github.com/jackc/pgx/v4 v4.18.3
+## explicit; go 1.17
+github.com/jackc/pgx/v4
+github.com/jackc/pgx/v4/internal/sanitize
+github.com/jackc/pgx/v4/pgxpool
+# github.com/jackc/puddle v1.3.0
+## explicit; go 1.12
+github.com/jackc/puddle
 # github.com/joho/godotenv v1.5.1
 ## explicit; go 1.12
 github.com/joho/godotenv
@@ -81,6 +97,12 @@ github.com/joho/godotenv
 github.com/josharian/intern
 # github.com/kr/pretty v0.3.1
 ## explicit; go 1.12
+# github.com/lann/builder v0.0.0-20180802200727-47ae307949d0
+## explicit
+github.com/lann/builder
+# github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0
+## explicit
+github.com/lann/ps
 # github.com/leodido/go-urn v1.4.0
 ## explicit; go 1.18
 github.com/leodido/go-urn
@@ -96,6 +118,9 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
+# github.com/pashagolub/pgxmock v1.8.0
+## explicit; go 1.17
+github.com/pashagolub/pgxmock
 # github.com/pmezard/go-difflib v1.0.0
 ## explicit
 github.com/pmezard/go-difflib/difflib
@@ -141,7 +166,6 @@ golang.org/x/net/webdav/internal/xml
 # golang.org/x/sync v0.23.0
 ## explicit; go 1.26.0
 golang.org/x/sync/errgroup
-golang.org/x/sync/semaphore
 # golang.org/x/sys v0.48.0
 ## explicit; go 1.26.0
 golang.org/x/sys/cpu
@@ -178,6 +202,8 @@ golang.org/x/tools/internal/gopathwalk
 golang.org/x/tools/internal/imports
 golang.org/x/tools/internal/modindex
 golang.org/x/tools/internal/stdlib
+# gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+## explicit; go 1.11
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit; go 1.15
 gopkg.in/yaml.v2

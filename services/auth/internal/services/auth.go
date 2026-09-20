@@ -7,18 +7,18 @@ import (
 	"github.com/MorozkoArt/CodeCollab/pkg/jwt"
 	"github.com/MorozkoArt/CodeCollab/pkg/password"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repository"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
 	"github.com/rs/zerolog/log"
 )
 
 var errInvalidCredentials = errors.New("invalid credentials")
 
 type AuthService struct {
-	userRepo   repository.UserRepository
+	userRepo   repo.UserRepository
 	jwtService *jwt.Service
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtService *jwt.Service) *AuthService {
+func NewAuthService(userRepo repo.UserRepository, jwtService *jwt.Service) *AuthService {
 	return &AuthService{
 		userRepo:   userRepo,
 		jwtService: jwtService,

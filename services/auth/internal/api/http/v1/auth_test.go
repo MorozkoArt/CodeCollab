@@ -13,7 +13,7 @@ import (
 	"github.com/MorozkoArt/CodeCollab/pkg/response"
 	v1 "github.com/MorozkoArt/CodeCollab/services/auth/internal/api/http/v1"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repository"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -33,7 +33,7 @@ const (
 	testPassword = "password123"
 )
 
-func newTestRouter(mockRepo *repository.MockUserRepository) http.Handler {
+func newTestRouter(mockRepo *repo.MockUserRepository) http.Handler {
 	jwtSvc := jwt.NewService(testJWTSecret, testJWTExpiry)
 	r := chi.NewRouter()
 	v1.Register(r, services.NewAuthService(mockRepo, jwtSvc), jwtSvc)
@@ -51,7 +51,7 @@ func postRequest(t *testing.T, h http.Handler, path string, body []byte) *httpte
 
 func TestRegister(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		mockRepo := new(repository.MockUserRepository)
+		mockRepo := new(repo.MockUserRepository)
 		mockRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
 
 		body, err := json.Marshal(domain.RegisterRequest{
@@ -67,8 +67,8 @@ func TestRegister(t *testing.T) {
 	})
 
 	t.Run("user exists: 409", func(t *testing.T) {
-		mockRepo := new(repository.MockUserRepository)
-		mockRepo.On("Create", mock.Anything, mock.Anything).Return(repository.ErrUserExists)
+		mockRepo := new(repo.MockUserRepository)
+		mockRepo.On("Create", mock.Anything, mock.Anything).Return(repo.ErrUserExists)
 
 		body, err := json.Marshal(domain.RegisterRequest{
 			Email:    "exists@example.com",
@@ -83,7 +83,7 @@ func TestRegister(t *testing.T) {
 	})
 
 	t.Run("invalid body: 400", func(t *testing.T) {
-		mockRepo := new(repository.MockUserRepository)
+		mockRepo := new(repo.MockUserRepository)
 		w := postRequest(t, newTestRouter(mockRepo), routeRegister, []byte("bad json"))
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
@@ -94,7 +94,7 @@ func TestLogin(t *testing.T) {
 		hashed, err := password.Hash(testPassword)
 		require.NoError(t, err)
 
-		mockRepo := new(repository.MockUserRepository)
+		mockRepo := new(repo.MockUserRepository)
 		mockRepo.On("GetByEmail", mock.Anything, testEmail).Return(&domain.User{
 			ID:       1,
 			Email:    testEmail,
@@ -121,7 +121,7 @@ func TestLogin(t *testing.T) {
 		hashed, err := password.Hash("correct_password")
 		require.NoError(t, err)
 
-		mockRepo := new(repository.MockUserRepository)
+		mockRepo := new(repo.MockUserRepository)
 		mockRepo.On("GetByEmail", mock.Anything, testEmail).Return(&domain.User{
 			ID:       1,
 			Email:    testEmail,

@@ -7,7 +7,7 @@ import (
 
 	"github.com/MorozkoArt/CodeCollab/pkg/response"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repository"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
@@ -49,7 +49,7 @@ func (h *authHandler) register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.authService.Register(r.Context(), &req); err != nil {
-		if errors.Is(err, repository.ErrUserExists) {
+		if errors.Is(err, repo.ErrUserExists) {
 			response.SendError(w, r, "user with this email already exists", http.StatusConflict)
 			return
 		}
