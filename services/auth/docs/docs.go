@@ -99,19 +99,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
@@ -148,8 +136,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string",
-                    "minLength": 6
+                    "type": "string"
                 }
             }
         },
@@ -158,9 +145,6 @@ const docTemplate = `{
             "properties": {
                 "token": {
                     "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.UserResponse"
                 }
             }
         },
@@ -177,25 +161,12 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string",
-                    "minLength": 6
+                    "minLength": 8
                 },
                 "username": {
                     "type": "string",
+                    "maxLength": 50,
                     "minLength": 3
-                }
-            }
-        },
-        "github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.UserResponse": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -227,8 +198,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "auth.codecollab.local",
 	BasePath:         "/api/v1",
 	Schemes:          []string{"https"},
-	Title:            "CodeCollab API",
-	Description:      "Collaborative code editor platform API",
+	Title:            "CodeCollab Auth API",
+	Description:      "Auth service API",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

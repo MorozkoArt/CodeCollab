@@ -3,67 +3,94 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 
-	"github.com/MorozkoArt/CodeCollab/pkg/jwt"
+	pkgjwt "github.com/MorozkoArt/CodeCollab/pkg/jwt"
 	"github.com/MorozkoArt/CodeCollab/pkg/password"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
-	"github.com/rs/zerolog/log"
 )
 
-var errInvalidCredentials = errors.New("invalid credentials")
+var (
+	ErrUserExists      = errors.New("user already exists")
+	ErrInvalidPassword = errors.New("invalid password")
+)
 
-type AuthService struct {
-	userRepo   repo.UserRepository
-	jwtService *jwt.Service
+type RegisterInput struct {
+	Username string
+	Email    string
+	Password string
 }
 
-func NewAuthService(userRepo repo.UserRepository, jwtService *jwt.Service) *AuthService {
-	return &AuthService{
-		userRepo:   userRepo,
-		jwtService: jwtService,
-	}
+type AuthService interface {
+	Register(ctx context.Context, input RegisterInput) error
+	Login(ctx context.Context, email, pass string) (string, error)
+	Validate(ctx context.Context, token string) (int64, error)
+	GetUser(ctx context.Context, id int64) (*domain.User, error)
 }
 
-func (s *AuthService) Register(ctx context.Context, req *domain.RegisterRequest) error {
-	log.Info().Ctx(ctx).Str("email", req.Email).Msg("Registering user")
-
-	return s.userRepo.Create(ctx, &domain.User{
-		Username: req.Username,
-		Email:    req.Email,
-		Password: req.Password,
-	})
+type authService struct {
+	repo   repo.UserRepository
+	jwtSvc pkgjwt.Service
 }
 
-func (s *AuthService) Login(ctx context.Context, req *domain.LoginRequest) (*domain.UserResponse, string, error) {
-	log.Info().Ctx(ctx).Str("email", req.Email).Msg("Login attempt")
+func NewAuthService(userRepo repo.UserRepository, jwtSvc pkgjwt.Service) AuthService {
+	return &authService{repo: userRepo, jwtSvc: jwtSvc}
+}
 
-	user, err := s.userRepo.GetByEmail(ctx, req.Email)
+func (s *authService) Register(ctx context.Context, input RegisterInput) error {
+	exists, err := s.repo.ExistsByEmail(ctx, input.Email)
 	if err != nil {
-		log.Warn().Ctx(ctx).Str("email", req.Email).Msg("Login failed: user not found")
-		return nil, "", errInvalidCredentials
+		return fmt.Errorf("check user existence: %w", err)
+	}
+	if exists {
+		return ErrUserExists
 	}
 
-	if !password.Check(req.Password, user.Password) {
-		log.Warn().Ctx(ctx).Str("email", req.Email).Msg("Login failed: invalid password")
-		return nil, "", errInvalidCredentials
-	}
-
-	token, err := s.jwtService.GenerateToken(user.ID, user.Email)
+	hashed, err := password.Hash(input.Password)
 	if err != nil {
-		log.Error().Err(err).Ctx(ctx).Msg("Failed to generate token")
-		return nil, "", err
+		return fmt.Errorf("hash password: %w", err)
 	}
 
-	log.Info().Ctx(ctx).Str("email", req.Email).Msg("Login successful")
+	if err := s.repo.Create(ctx, &domain.User{
+		Username: input.Username,
+		Email:    input.Email,
+		Password: hashed,
+	}); err != nil {
+		return fmt.Errorf("create user: %w", err)
+	}
 
-	return &domain.UserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		Email:    user.Email,
-	}, token, nil
+	return nil
 }
 
-func (s *AuthService) ValidateToken(tokenString string) (*jwt.Claims, error) {
-	return s.jwtService.ValidateToken(tokenString)
+func (s *authService) Login(ctx context.Context, email, pass string) (string, error) {
+	user, err := s.repo.GetByEmail(ctx, email)
+	if err != nil {
+		if errors.Is(err, repo.ErrUserNotFound) {
+			return "", ErrInvalidPassword
+		}
+		return "", fmt.Errorf("get user: %w", err)
+	}
+
+	if !password.Check(pass, user.Password) {
+		return "", ErrInvalidPassword
+	}
+
+	return s.jwtSvc.GenerateToken(user.ID, user.Email)
+}
+
+func (s *authService) Validate(ctx context.Context, token string) (int64, error) {
+	claims, err := s.jwtSvc.ValidateToken(token)
+	if err != nil {
+		return 0, err
+	}
+	return claims.UserID, nil
+}
+
+func (s *authService) GetUser(ctx context.Context, id int64) (*domain.User, error) {
+	user, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get user: %w", err)
+	}
+	return user, nil
 }

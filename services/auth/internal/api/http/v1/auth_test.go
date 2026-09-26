@@ -31,6 +31,7 @@ const (
 	testEmail    = "test@example.com"
 	testUsername = "testuser"
 	testPassword = "password123"
+	testUserID   = int64(1)
 )
 
 func newTestRouter(mockRepo *repo.MockUserRepository) http.Handler {
@@ -52,6 +53,7 @@ func postRequest(t *testing.T, h http.Handler, path string, body []byte) *httpte
 func TestRegister(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mockRepo := new(repo.MockUserRepository)
+		mockRepo.On("ExistsByEmail", mock.Anything, "new@example.com").Return(false, nil)
 		mockRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
 
 		body, err := json.Marshal(domain.RegisterRequest{
@@ -68,7 +70,7 @@ func TestRegister(t *testing.T) {
 
 	t.Run("user exists: 409", func(t *testing.T) {
 		mockRepo := new(repo.MockUserRepository)
-		mockRepo.On("Create", mock.Anything, mock.Anything).Return(repo.ErrUserExists)
+		mockRepo.On("ExistsByEmail", mock.Anything, "exists@example.com").Return(true, nil)
 
 		body, err := json.Marshal(domain.RegisterRequest{
 			Email:    "exists@example.com",
@@ -96,7 +98,7 @@ func TestLogin(t *testing.T) {
 
 		mockRepo := new(repo.MockUserRepository)
 		mockRepo.On("GetByEmail", mock.Anything, testEmail).Return(&domain.User{
-			ID:       1,
+			ID:       testUserID,
 			Email:    testEmail,
 			Username: testUsername,
 			Password: hashed,
@@ -123,7 +125,7 @@ func TestLogin(t *testing.T) {
 
 		mockRepo := new(repo.MockUserRepository)
 		mockRepo.On("GetByEmail", mock.Anything, testEmail).Return(&domain.User{
-			ID:       1,
+			ID:       testUserID,
 			Email:    testEmail,
 			Password: hashed,
 		}, nil)

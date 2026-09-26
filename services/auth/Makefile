@@ -10,8 +10,6 @@ DEV_COMPOSE    := docker/dev/docker-compose.yml
 PROD_COMPOSE   := docker/prod/docker-compose.yml
 MIGRATIONS_DIR := db/migrations
 
-GOOSE_DBSTRING_LOCAL := postgresql://$(DB_USER):$(DB_PASSWORD)@localhost:$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)
-
 ifeq ($(OS),Windows_NT)
     SET_GOBIN   := set "GOBIN=$(LOCAL_BIN)" &&
     NULL_DEVICE := NUL
@@ -32,6 +30,9 @@ install-deps:
 	$(SET_GOBIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.13.2
 	$(SET_GOBIN) go install github.com/pressly/goose/v3/cmd/goose@v3.24.1
 	$(SET_GOBIN) go install github.com/swaggo/swag/cmd/swag@latest
+	$(SET_GOBIN) go install github.com/bufbuild/buf/cmd/buf@latest
+	$(SET_GOBIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	$(SET_GOBIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 # Dev
 up:
@@ -79,3 +80,7 @@ test-cover:
 # swagger
 swagger:
 	$(LOCAL_BIN)/swag init -g cmd/server/main.go -o docs --parseDependency --parseInternal
+
+# Proto
+proto:
+	$(LOCAL_BIN)/buf generate

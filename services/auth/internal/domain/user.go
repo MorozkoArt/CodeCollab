@@ -1,30 +1,27 @@
 package domain
 
+import "time"
+
 type User struct {
-	ID       int64  `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"password,omitempty"`
-	Username string `json:"username"`
+	ID        int64
+	Username  string
+	Email     string
+	Password  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type RegisterRequest struct {
+	Username string `json:"username" validate:"required,min=3,max=50"`
 	Email    string `json:"email"    validate:"required,email"`
-	Password string `json:"password" validate:"required,min=6"`
-	Username string `json:"username" validate:"required,min=3"`
+	Password string `json:"password" validate:"required,min=8"`
 }
 
 type LoginRequest struct {
 	Email    string `json:"email"    validate:"required,email"`
-	Password string `json:"password" validate:"required,min=6"`
-}
-
-type UserResponse struct {
-	ID       int64  `json:"id"`
-	Email    string `json:"email"`
-	Username string `json:"username"`
+	Password string `json:"password" validate:"required"`
 }
 
 type LoginResponse struct {
-	Token string        `json:"token"`
-	User  *UserResponse `json:"user"`
+	Token string `json:"token"`
 }

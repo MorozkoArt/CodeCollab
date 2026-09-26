@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "github.com/MorozkoArt/CodeCollab/services/auth/pkg/authv1;authv1";
+
+service AuthService {
+  rpc Register(RegisterRequest)   returns (RegisterResponse);
+  rpc Login(LoginRequest)         returns (LoginResponse);
+  rpc Validate(ValidateRequest)   returns (ValidateResponse);
+  rpc GetUser(GetUserRequest)     returns (GetUserResponse);
+}
+
+message RegisterRequest {
+  string username = 1;
+  string email    = 2;
+  string password = 3;
+}
+
+message RegisterResponse {}
+
+message LoginRequest {
+  string email    = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message ValidateRequest {
+  string token = 1;
+}
+
+message ValidateResponse {
+  int64 user_id = 1;
+}
+
+message GetUserRequest {
+  int64 user_id = 1;
+}
+
+message GetUserResponse {
+  int64  id         = 1;
+  string username   = 2;
+  string email      = 3;
+  string created_at = 4;
+}

@@ -7,18 +7,17 @@ import (
 
 	"github.com/MorozkoArt/CodeCollab/pkg/response"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/go-playground/validator/v10"
 	"github.com/rs/zerolog/log"
 )
 
 type authHandler struct {
-	authService *services.AuthService
+	authService services.AuthService
 	validate    *validator.Validate
 }
 
-func newAuthHandler(svc *services.AuthService) *authHandler {
+func newAuthHandler(svc services.AuthService) *authHandler {
 	return &authHandler{
 		authService: svc,
 		validate:    validator.New(),
@@ -31,7 +30,7 @@ func newAuthHandler(svc *services.AuthService) *authHandler {
 // @Accept       json
 // @Produce      json
 // @Param        request body      domain.RegisterRequest true "Register request"
-// @Success      201     {object}  response.Response{data=string}
+// @Success      201     {object}  response.Response
 // @Failure      400     {object}  response.Response
 // @Failure      409     {object}  response.Response
 // @Failure      500     {object}  response.Response
@@ -48,8 +47,12 @@ func (h *authHandler) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.authService.Register(r.Context(), &req); err != nil {
-		if errors.Is(err, repo.ErrUserExists) {
+	if err := h.authService.Register(r.Context(), services.RegisterInput{
+		Username: req.Username,
+		Email:    req.Email,
+		Password: req.Password,
+	}); err != nil {
+		if errors.Is(err, services.ErrUserExists) {
 			response.SendError(w, r, "user with this email already exists", http.StatusConflict)
 			return
 		}
@@ -58,7 +61,7 @@ func (h *authHandler) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.SendSuccess(w, "user registered successfully", http.StatusCreated)
+	response.SendSuccess(w, nil, http.StatusCreated)
 }
 
 // login godoc
@@ -83,11 +86,16 @@ func (h *authHandler) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, token, err := h.authService.Login(r.Context(), &req)
+	token, err := h.authService.Login(r.Context(), req.Email, req.Password)
 	if err != nil {
-		response.SendError(w, r, "invalid email or password", http.StatusUnauthorized)
+		if errors.Is(err, services.ErrInvalidPassword) {
+			response.SendError(w, r, "invalid email or password", http.StatusUnauthorized)
+			return
+		}
+		log.Error().Err(err).Ctx(r.Context()).Msg("Failed to login")
+		response.SendError(w, r, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	response.SendSuccess(w, domain.LoginResponse{Token: token, User: user}, http.StatusOK)
+	response.SendSuccess(w, domain.LoginResponse{Token: token}, http.StatusOK)
 }

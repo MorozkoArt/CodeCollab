@@ -29,7 +29,7 @@ const (
 	notFoundEmail = "notfound@example.com"
 )
 
-func newTestService(mockRepo *repo.MockUserRepository) *services.AuthService {
+func newTestService(mockRepo *repo.MockUserRepository) services.AuthService {
 	return services.NewAuthService(mockRepo, jwt.NewService(testJWTSecret, testJWTExpiry))
 }
 
@@ -38,9 +38,10 @@ func TestAuthService_Register(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		mockRepo := new(repo.MockUserRepository)
+		mockRepo.On("ExistsByEmail", ctx, testEmail).Return(false, nil)
 		mockRepo.On("Create", ctx, mock.Anything).Return(nil)
 
-		err := newTestService(mockRepo).Register(ctx, &domain.RegisterRequest{
+		err := newTestService(mockRepo).Register(ctx, services.RegisterInput{
 			Email:    testEmail,
 			Password: testPassword,
 			Username: testUsername,
@@ -51,14 +52,14 @@ func TestAuthService_Register(t *testing.T) {
 
 	t.Run("user already exists", func(t *testing.T) {
 		mockRepo := new(repo.MockUserRepository)
-		mockRepo.On("Create", ctx, mock.Anything).Return(repo.ErrUserExists)
+		mockRepo.On("ExistsByEmail", ctx, existingEmail).Return(true, nil)
 
-		err := newTestService(mockRepo).Register(ctx, &domain.RegisterRequest{
+		err := newTestService(mockRepo).Register(ctx, services.RegisterInput{
 			Email:    existingEmail,
 			Password: testPassword,
 			Username: existingUser,
 		})
-		assert.ErrorIs(t, err, repo.ErrUserExists)
+		assert.ErrorIs(t, err, services.ErrUserExists)
 		mockRepo.AssertExpectations(t)
 	})
 }
@@ -78,32 +79,24 @@ func TestAuthService_Login(t *testing.T) {
 			Password: hashed,
 		}, nil)
 
-		user, token, err := newTestService(mockRepo).Login(ctx, &domain.LoginRequest{
-			Email:    testEmail,
-			Password: testPassword,
-		})
-
+		token, err := newTestService(mockRepo).Login(ctx, testEmail, testPassword)
 		require.NoError(t, err)
 		assert.NotEmpty(t, token)
-		assert.Equal(t, testUserID, user.ID)
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("user not found", func(t *testing.T) {
 		mockRepo := new(repo.MockUserRepository)
-		mockRepo.On("GetByEmail", ctx, notFoundEmail).
-			Return(nil, repo.ErrUserNotFound)
+		mockRepo.On("GetByEmail", ctx, notFoundEmail).Return(nil, repo.ErrUserNotFound)
 
-		_, _, err := newTestService(mockRepo).Login(ctx, &domain.LoginRequest{
-			Email:    notFoundEmail,
-			Password: testPassword,
-		})
-		assert.Error(t, err)
+		_, err := newTestService(mockRepo).Login(ctx, notFoundEmail, testPassword)
+		assert.ErrorIs(t, err, services.ErrInvalidPassword)
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("wrong password", func(t *testing.T) {
-		hashed, _ := password.Hash("correct_password")
+		hashed, err := password.Hash("correct_password")
+		require.NoError(t, err)
 
 		mockRepo := new(repo.MockUserRepository)
 		mockRepo.On("GetByEmail", ctx, testEmail).Return(&domain.User{
@@ -112,11 +105,8 @@ func TestAuthService_Login(t *testing.T) {
 			Password: hashed,
 		}, nil)
 
-		_, _, err := newTestService(mockRepo).Login(ctx, &domain.LoginRequest{
-			Email:    testEmail,
-			Password: "wrong_password",
-		})
-		assert.Error(t, err)
+		_, err = newTestService(mockRepo).Login(ctx, testEmail, "wrong_password")
+		assert.ErrorIs(t, err, services.ErrInvalidPassword)
 		mockRepo.AssertExpectations(t)
 	})
 }

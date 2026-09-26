@@ -5,7 +5,6 @@ definitions:
       email:
         type: string
       password:
-        minLength: 6
         type: string
     required:
     - email
@@ -15,32 +14,22 @@ definitions:
     properties:
       token:
         type: string
-      user:
-        $ref: '#/definitions/github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.UserResponse'
     type: object
   github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.RegisterRequest:
     properties:
       email:
         type: string
       password:
-        minLength: 6
+        minLength: 8
         type: string
       username:
+        maxLength: 50
         minLength: 3
         type: string
     required:
     - email
     - password
     - username
-    type: object
-  github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.UserResponse:
-    properties:
-      email:
-        type: string
-      id:
-        type: integer
-      username:
-        type: string
     type: object
   response.Response:
     properties:
@@ -53,8 +42,8 @@ definitions:
 host: auth.codecollab.local
 info:
   contact: {}
-  description: Collaborative code editor platform API
-  title: CodeCollab API
+  description: Auth service API
+  title: CodeCollab Auth API
   version: "1.0"
 paths:
   /auth/login:
@@ -108,12 +97,7 @@ paths:
         "201":
           description: Created
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  type: string
-              type: object
+            $ref: '#/definitions/response.Response'
         "400":
           description: Bad Request
           schema:

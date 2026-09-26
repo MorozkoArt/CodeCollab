@@ -12,7 +12,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-func Register(r chi.Router, authSvc *services.AuthService, jwtSvc *jwt.Service) {
+func Register(r chi.Router, authSvc services.AuthService, jwtSvc jwt.Service) {
 	auth := newAuthHandler(authSvc)
 
 	// Swagger UI

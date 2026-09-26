@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/MorozkoArt/CodeCollab/services/auth/config"
 	httpmiddleware "github.com/MorozkoArt/CodeCollab/services/auth/internal/api/http/middleware"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/config"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog/log"
