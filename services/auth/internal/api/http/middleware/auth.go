@@ -1,0 +1,50 @@
+package middleware
+
+import (
+	"context"
+	"net/http"
+	"strings"
+
+	"github.com/MorozkoArt/CodeCollab/pkg/jwt"
+	"github.com/MorozkoArt/CodeCollab/services/auth/pkg/enum"
+	"github.com/rs/zerolog/log"
+)
+
+const ClaimsKey contextKey = "claims"
+
+type contextKey string
+
+func Auth(jwtService jwt.Service) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authHeader := r.Header.Get(enum.AuthHeaderKey)
+			token := strings.TrimSpace(strings.TrimPrefix(authHeader, enum.BearerPrefix))
+
+			if token == "" {
+				log.Warn().
+					Ctx(r.Context()).
+					Str("path", r.URL.Path).
+					Str("remote_addr", r.RemoteAddr).
+					Msg("Unauthorized: missing token")
+
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			claims, err := jwtService.ValidateToken(token)
+			if err != nil {
+				log.Warn().
+					Err(err).
+					Ctx(r.Context()).
+					Str("path", r.URL.Path).
+					Msg("Unauthorized: invalid token")
+
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), ClaimsKey, claims)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}

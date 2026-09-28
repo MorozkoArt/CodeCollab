@@ -1,0 +1,26 @@
+name: codecollab-db
+
+services:
+  postgres:
+    image: ghcr.io/morozkoart/codecollab/postgres:latest
+    container_name: codecollab-db
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    command: ["postgres", "-p", "${POSTGRES_PORT}"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - codecollab-network
+
+volumes:
+  postgres_data:
+    name: codecollab-postgres-data
+
+networks:
+  codecollab-network:
+    name: codecollab-network
+    driver: bridge
