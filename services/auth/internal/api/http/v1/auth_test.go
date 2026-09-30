@@ -13,7 +13,7 @@ import (
 	"github.com/MorozkoArt/CodeCollab/pkg/response"
 	v1 "github.com/MorozkoArt/CodeCollab/services/auth/internal/api/http/v1"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -34,7 +34,7 @@ const (
 	testUserID   = int64(1)
 )
 
-func newTestRouter(mockRepo *repo.MockUserRepository) http.Handler {
+func newTestRouter(mockRepo *user.MockUserRepository) http.Handler {
 	jwtSvc := jwt.NewService(testJWTSecret, testJWTExpiry)
 	r := chi.NewRouter()
 	v1.Register(r, services.NewAuthService(mockRepo, jwtSvc), jwtSvc)
@@ -52,7 +52,7 @@ func postRequest(t *testing.T, h http.Handler, path string, body []byte) *httpte
 
 func TestRegister(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		mockRepo.On("ExistsByEmail", mock.Anything, "new@example.com").Return(false, nil)
 		mockRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
 
@@ -69,7 +69,7 @@ func TestRegister(t *testing.T) {
 	})
 
 	t.Run("user exists: 409", func(t *testing.T) {
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		mockRepo.On("ExistsByEmail", mock.Anything, "exists@example.com").Return(true, nil)
 
 		body, err := json.Marshal(v1.RegisterRequest{
@@ -85,7 +85,7 @@ func TestRegister(t *testing.T) {
 	})
 
 	t.Run("invalid body: 400", func(t *testing.T) {
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		w := postRequest(t, newTestRouter(mockRepo), routeRegister, []byte("bad json"))
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
@@ -96,7 +96,7 @@ func TestLogin(t *testing.T) {
 		hashed, err := password.Hash(testPassword)
 		require.NoError(t, err)
 
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		mockRepo.On("GetByEmail", mock.Anything, testEmail).Return(&domain.User{
 			ID:       testUserID,
 			Email:    testEmail,
@@ -123,7 +123,7 @@ func TestLogin(t *testing.T) {
 		hashed, err := password.Hash("correct_password")
 		require.NoError(t, err)
 
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		mockRepo.On("GetByEmail", mock.Anything, testEmail).Return(&domain.User{
 			ID:       testUserID,
 			Email:    testEmail,

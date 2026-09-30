@@ -28,7 +28,7 @@ func newAuthHandler(svc services.AuthService) *authHandler {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        request body      domain.RegisterRequest true "Register request"
+// @Param        request body      RegisterRequest true "Register request"
 // @Success      201     {object}  response.Response
 // @Failure      400     {object}  response.Response
 // @Failure      409     {object}  response.Response
@@ -69,8 +69,8 @@ func (h *authHandler) register(w http.ResponseWriter, r *http.Request) {
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        request body      domain.LoginRequest true "Login request"
-// @Success      200     {object}  response.Response{data=domain.LoginResponse}
+// @Param        request body      LoginRequest true "Login request"
+// @Success      200     {object}  response.Response{data=LoginResponse}
 // @Failure      400     {object}  response.Response
 // @Failure      401     {object}  response.Response
 // @Router       /auth/login [post]

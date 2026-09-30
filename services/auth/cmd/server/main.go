@@ -27,7 +27,7 @@ import (
 	v1 "github.com/MorozkoArt/CodeCollab/services/auth/internal/api/http/v1"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/app"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/config"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -67,7 +67,7 @@ func run() error {
 	}
 	defer dbClient.Close()
 
-	userRepo := repo.NewUserRepository(dbClient.SQL(), dbClient.Builder())
+	userRepo := user.NewUserRepository(dbClient.SQL(), dbClient.Builder())
 	jwtSvc := pkgjwt.NewService(cfg.Auth.JWTSecret(), cfg.Auth.TokenExpiry())
 	authSvc := services.NewAuthService(userRepo, jwtSvc)
 

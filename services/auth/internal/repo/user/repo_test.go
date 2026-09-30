@@ -1,4 +1,4 @@
-package repo_test
+package user_test
 
 import (
 	"context"
@@ -7,14 +7,14 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
 	"github.com/jackc/pgx/v4"
 	"github.com/pashagolub/pgxmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func newMockRepo(t *testing.T) (repo.UserRepository, pgxmock.PgxConnIface) {
+func newMockRepo(t *testing.T) (user.UserRepository, pgxmock.PgxConnIface) {
 	t.Helper()
 
 	mock, err := pgxmock.NewConn()
@@ -22,7 +22,7 @@ func newMockRepo(t *testing.T) (repo.UserRepository, pgxmock.PgxConnIface) {
 
 	t.Cleanup(func() { mock.Close(context.Background()) })
 
-	r := repo.NewUserRepository(adapter{PgxConnIface: mock}, squirrel.StatementBuilder)
+	r := user.NewUserRepository(adapter{PgxConnIface: mock}, squirrel.StatementBuilder)
 	return r, mock
 }
 
@@ -104,7 +104,7 @@ func TestUserRepository_GetByEmail(t *testing.T) {
 			WillReturnError(pgx.ErrNoRows)
 
 		_, err := r.GetByEmail(ctx, "notfound@example.com")
-		assert.ErrorIs(t, err, repo.ErrUserNotFound)
+		assert.ErrorIs(t, err, user.ErrUserNotFound)
 		assert.NoError(t, mock.ExpectationsWereMet())
 	})
 }
@@ -136,7 +136,7 @@ func TestUserRepository_GetByID(t *testing.T) {
 			WillReturnError(pgx.ErrNoRows)
 
 		_, err := r.GetByID(ctx, 999999)
-		assert.ErrorIs(t, err, repo.ErrUserNotFound)
+		assert.ErrorIs(t, err, user.ErrUserNotFound)
 		assert.NoError(t, mock.ExpectationsWereMet())
 	})
 }

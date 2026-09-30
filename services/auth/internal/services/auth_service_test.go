@@ -8,7 +8,7 @@ import (
 	"github.com/MorozkoArt/CodeCollab/pkg/jwt"
 	"github.com/MorozkoArt/CodeCollab/pkg/password"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -29,7 +29,7 @@ const (
 	notFoundEmail = "notfound@example.com"
 )
 
-func newTestService(mockRepo *repo.MockUserRepository) services.AuthService {
+func newTestService(mockRepo *user.MockUserRepository) services.AuthService {
 	return services.NewAuthService(mockRepo, jwt.NewService(testJWTSecret, testJWTExpiry))
 }
 
@@ -37,7 +37,7 @@ func TestAuthService_Register(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("success", func(t *testing.T) {
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		mockRepo.On("ExistsByEmail", ctx, testEmail).Return(false, nil)
 		mockRepo.On("Create", ctx, mock.Anything).Return(nil)
 
@@ -51,7 +51,7 @@ func TestAuthService_Register(t *testing.T) {
 	})
 
 	t.Run("user already exists", func(t *testing.T) {
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		mockRepo.On("ExistsByEmail", ctx, existingEmail).Return(true, nil)
 
 		err := newTestService(mockRepo).Register(ctx, services.RegisterInput{
@@ -71,7 +71,7 @@ func TestAuthService_Login(t *testing.T) {
 		hashed, err := password.Hash(testPassword)
 		require.NoError(t, err)
 
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		mockRepo.On("GetByEmail", ctx, testEmail).Return(&domain.User{
 			ID:       testUserID,
 			Email:    testEmail,
@@ -86,8 +86,8 @@ func TestAuthService_Login(t *testing.T) {
 	})
 
 	t.Run("user not found", func(t *testing.T) {
-		mockRepo := new(repo.MockUserRepository)
-		mockRepo.On("GetByEmail", ctx, notFoundEmail).Return(nil, repo.ErrUserNotFound)
+		mockRepo := new(user.MockUserRepository)
+		mockRepo.On("GetByEmail", ctx, notFoundEmail).Return(nil, user.ErrUserNotFound)
 
 		_, err := newTestService(mockRepo).Login(ctx, notFoundEmail, testPassword)
 		assert.ErrorIs(t, err, services.ErrInvalidPassword)
@@ -98,7 +98,7 @@ func TestAuthService_Login(t *testing.T) {
 		hashed, err := password.Hash("correct_password")
 		require.NoError(t, err)
 
-		mockRepo := new(repo.MockUserRepository)
+		mockRepo := new(user.MockUserRepository)
 		mockRepo.On("GetByEmail", ctx, testEmail).Return(&domain.User{
 			ID:       testUserID,
 			Email:    testEmail,

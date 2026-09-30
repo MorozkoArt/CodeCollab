@@ -5,6 +5,7 @@ type Config struct {
 	*DB
 	*Auth
 	*App
+	*Mail
 }
 
 func NewConfig() *Config {
@@ -13,5 +14,6 @@ func NewConfig() *Config {
 		DB:     NewDBConfig(),
 		Auth:   NewAuthConfig(),
 		App:    NewAppConfig(),
+		Mail:   NewMailConfig(),
 	}
 }

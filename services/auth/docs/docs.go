@@ -34,7 +34,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.LoginRequest"
+                            "$ref": "#/definitions/internal_api_http_v1.LoginRequest"
                         }
                     }
                 ],
@@ -50,7 +50,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.LoginResponse"
+                                            "$ref": "#/definitions/internal_api_http_v1.LoginResponse"
                                         }
                                     }
                                 }
@@ -91,7 +91,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.RegisterRequest"
+                            "$ref": "#/definitions/internal_api_http_v1.RegisterRequest"
                         }
                     }
                 ],
@@ -125,7 +125,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.LoginRequest": {
+        "internal_api_http_v1.LoginRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -140,7 +140,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.LoginResponse": {
+        "internal_api_http_v1.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -148,7 +148,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_MorozkoArt_CodeCollab_services_auth_internal_domain.RegisterRequest": {
+        "internal_api_http_v1.RegisterRequest": {
             "type": "object",
             "required": [
                 "email",

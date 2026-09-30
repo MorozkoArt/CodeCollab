@@ -13,4 +13,7 @@ const (
 	// Контекст
 	ContextUserID = "user_id"
 	ContextEmail  = "email"
+
+	PurposeRegister = "register"
+	PurposeLogin    = "login"
 )

@@ -8,7 +8,7 @@ import (
 	pkgjwt "github.com/MorozkoArt/CodeCollab/pkg/jwt"
 	"github.com/MorozkoArt/CodeCollab/pkg/password"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
 )
 
 var (
@@ -30,11 +30,11 @@ type AuthService interface {
 }
 
 type authService struct {
-	repo   repo.UserRepository
+	repo   user.UserRepository
 	jwtSvc pkgjwt.Service
 }
 
-func NewAuthService(userRepo repo.UserRepository, jwtSvc pkgjwt.Service) AuthService {
+func NewAuthService(userRepo user.UserRepository, jwtSvc pkgjwt.Service) AuthService {
 	return &authService{repo: userRepo, jwtSvc: jwtSvc}
 }
 
@@ -66,7 +66,7 @@ func (s *authService) Register(ctx context.Context, input RegisterInput) error {
 func (s *authService) Login(ctx context.Context, email, pass string) (string, error) {
 	user, err := s.repo.GetByEmail(ctx, email)
 	if err != nil {
-		if errors.Is(err, repo.ErrUserNotFound) {
+		if errors.Is(err, user.ErrUserNotFound) {
 			return "", ErrInvalidPassword
 		}
 		return "", fmt.Errorf("get user: %w", err)

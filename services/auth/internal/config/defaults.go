@@ -21,4 +21,8 @@ const (
 
 	// App
 	defaultAppEnv = "development"
+
+	// Mail
+	defaultSMTPPort = 587
+	defaultSMTPTLS  = "starttls"
 )

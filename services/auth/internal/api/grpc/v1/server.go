@@ -5,7 +5,7 @@ import (
 
 	"github.com/MorozkoArt/CodeCollab/pkg/grpcerr"
 	pkgjwt "github.com/MorozkoArt/CodeCollab/pkg/jwt"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/MorozkoArt/CodeCollab/services/auth/pkg/authv1"
 	"google.golang.org/grpc/codes"
@@ -57,7 +57,7 @@ func (s *Server) GetUser(ctx context.Context, req *authv1.GetUserRequest) (*auth
 	user, err := s.authSvc.GetUser(ctx, req.UserId)
 	if err != nil {
 		return nil, grpcerr.Error(ctx, err, "get_user",
-			grpcerr.Map(repo.ErrUserNotFound, codes.NotFound, "user not found"),
+			grpcerr.Map(user.ErrUserNotFound, codes.NotFound, "user not found"),
 		)
 	}
 	return &authv1.GetUserResponse{
