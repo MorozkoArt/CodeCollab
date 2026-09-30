@@ -47,15 +47,6 @@ auth-up:
 auth-down:
 	$(MAKE) -C services/auth down
 
-auth-test:
-	$(MAKE) -C services/auth test
-
-auth-lint:
-	$(MAKE) -C services/auth lint
-
-auth-migrate:
-	$(MAKE) -C services/auth m_up
-
 nginx-up:
 	$(MAKE) -C nginx up
 
