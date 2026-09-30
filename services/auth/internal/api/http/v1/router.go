@@ -7,13 +7,13 @@ import (
 
 	"github.com/MorozkoArt/CodeCollab/pkg/jwt"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/api/http/middleware"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
+	authsvc "github.com/MorozkoArt/CodeCollab/services/auth/internal/services/auth"
 	"github.com/MorozkoArt/CodeCollab/services/auth/pkg/enum"
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-func Register(r chi.Router, authSvc services.AuthService, jwtSvc jwt.Service) {
+func Register(r chi.Router, authSvc authsvc.Service, jwtSvc jwt.Service) {
 	auth := newAuthHandler(authSvc)
 
 	// Swagger UI
@@ -25,7 +25,9 @@ func Register(r chi.Router, authSvc services.AuthService, jwtSvc jwt.Service) {
 		// Публичные роуты
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/register", auth.register)
+			r.Post("/register/confirm", auth.confirmRegistration)
 			r.Post("/login", auth.login)
+			r.Post("/login/verify", auth.verifyLogin)
 		})
 
 		// Защищённые роуты

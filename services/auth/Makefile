@@ -6,8 +6,8 @@ endif
 
 LOCAL_BIN      := $(CURDIR)/bin
 DOCKER_COMPOSE := docker compose
-DEV_COMPOSE    := docker/dev/docker-compose.yml
-PROD_COMPOSE   := docker/prod/docker-compose.yml
+DEV_COMPOSE    := deployments/dev/docker-compose.yml
+PROD_COMPOSE   := deployments/prod/docker-compose.yml
 MIGRATIONS_DIR := db/migrations
 
 ifeq ($(OS),Windows_NT)
@@ -79,7 +79,7 @@ test-cover:
 
 # swagger
 swagger:
-	$(LOCAL_BIN)/swag init -g cmd/server/main.go -o docs --parseDependency --parseInternal
+	$(LOCAL_BIN)/swag init -g cmd/auth/main.go -o api/swagger --parseDependency --parseInternal
 
 # Proto
 proto:

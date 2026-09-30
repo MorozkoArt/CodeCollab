@@ -1,0 +1,2 @@
+ARG MAILPIT_VERSION=latest
+FROM axllent/mailpit:${MAILPIT_VERSION}
