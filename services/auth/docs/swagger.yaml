@@ -1,10 +1,21 @@
 basePath: /api/v1
 definitions:
+  internal_api_http_v1.CodeRequest:
+    properties:
+      code:
+        type: string
+      email:
+        type: string
+    required:
+    - code
+    - email
+    type: object
   internal_api_http_v1.LoginRequest:
     properties:
       email:
         type: string
       password:
+        maxLength: 128
         type: string
     required:
     - email
@@ -20,6 +31,7 @@ definitions:
       email:
         type: string
       password:
+        maxLength: 128
         minLength: 8
         type: string
       username:
@@ -60,6 +72,47 @@ paths:
       produces:
       - application/json
       responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/response.Response'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 'Login (step 1: check password, send code to email)'
+      tags:
+      - auth
+  /auth/login/verify:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Email and code
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_http_v1.CodeRequest'
+      produces:
+      - application/json
+      responses:
         "200":
           description: OK
           schema:
@@ -73,11 +126,11 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Login
+      summary: 'Login (step 2: verify code from email, get JWT)'
       tags:
       - auth
   /auth/register:
@@ -94,8 +147,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "202":
+          description: Accepted
           schema:
             $ref: '#/definitions/response.Response'
         "400":
@@ -106,11 +159,44 @@ paths:
           description: Conflict
           schema:
             $ref: '#/definitions/response.Response'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/response.Response'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/response.Response'
-      summary: Register a new user
+      summary: 'Register a new user (step 1: sends confirmation code to email)'
+      tags:
+      - auth
+  /auth/register/confirm:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Email and code
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_api_http_v1.CodeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 'Confirm registration (step 2: verify code from email)'
       tags:
       - auth
 schemes:

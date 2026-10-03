@@ -25,7 +25,9 @@ func Register(r chi.Router, authSvc services.AuthService, jwtSvc jwt.Service) {
 		// Публичные роуты
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/register", auth.register)
+			r.Post("/register/confirm", auth.confirmRegistration)
 			r.Post("/login", auth.login)
+			r.Post("/login/verify", auth.verifyLogin)
 		})
 
 		// Защищённые роуты

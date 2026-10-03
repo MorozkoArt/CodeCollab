@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/config"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
 	"github.com/MorozkoArt/CodeCollab/services/auth/pkg/enum"
 )
 

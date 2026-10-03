@@ -19,9 +19,7 @@ const (
 	saltLen            = 16
 	keyLen      uint32 = 32
 
-	// MaxLength защищает от DoS длинными паролями (в байтах).
-	MaxLength = 1024
-	// Ограничиваем число одновременных хэшей: каждый занимает 64 MiB RAM.
+	MaxLength     = 1024
 	maxConcurrent = 4
 )
 
@@ -52,7 +50,6 @@ func Hash(password string) (string, error) {
 		argon2.Version, memoryKiB, iterations, parallelism, b64.EncodeToString(salt), b64.EncodeToString(key)), nil
 }
 
-// Check проверяет пароль. Поддерживает argon2id
 func Check(password, hash string) bool {
 	if len(password) > MaxLength {
 		return false
@@ -70,22 +67,12 @@ func Check(password, hash string) bool {
 	return subtle.ConstantTimeCompare(got, key) == 1
 }
 
-// NeedsRehash true для argon2id со старыми параметрами.
-func NeedsRehash(hash string) bool {
-	p, _, key, err := decode(hash)
-	if err != nil {
-		return true
-	}
-	return p.m != memoryKiB || p.t != iterations || p.p != parallelism || uint32(len(key)) != keyLen
-}
-
 var dummyHash = sync.OnceValue(func() string {
 	h, _ := Hash("dummy-password")
 	return h
 })
 
-// Dummy тратит столько же времени, сколько реальная проверка
-// Вызываем, когда пользователь не найден, чтобы не раскрывать существование email по времени ответа
+// Dummy выравнивает время ответа, когда пользователь не найден.
 func Dummy(password string) { Check(password, dummyHash()) }
 
 type params struct {

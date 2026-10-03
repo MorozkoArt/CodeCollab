@@ -171,7 +171,6 @@ func (x *LoginRequest) GetPassword() string {
 
 type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -204,13 +203,6 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
 func (*LoginResponse) Descriptor() ([]byte, []int) {
 	return file_auth_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *LoginResponse) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
 }
 
 type ValidateRequest struct {
@@ -413,6 +405,190 @@ func (x *GetUserResponse) GetCreatedAt() string {
 	return ""
 }
 
+type ConfirmRegistrationRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConfirmRegistrationRequest) Reset() {
+	*x = ConfirmRegistrationRequest{}
+	mi := &file_auth_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConfirmRegistrationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConfirmRegistrationRequest) ProtoMessage() {}
+
+func (x *ConfirmRegistrationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConfirmRegistrationRequest.ProtoReflect.Descriptor instead.
+func (*ConfirmRegistrationRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ConfirmRegistrationRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *ConfirmRegistrationRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+type ConfirmRegistrationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConfirmRegistrationResponse) Reset() {
+	*x = ConfirmRegistrationResponse{}
+	mi := &file_auth_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConfirmRegistrationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConfirmRegistrationResponse) ProtoMessage() {}
+
+func (x *ConfirmRegistrationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConfirmRegistrationResponse.ProtoReflect.Descriptor instead.
+func (*ConfirmRegistrationResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{9}
+}
+
+type VerifyLoginRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyLoginRequest) Reset() {
+	*x = VerifyLoginRequest{}
+	mi := &file_auth_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyLoginRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyLoginRequest) ProtoMessage() {}
+
+func (x *VerifyLoginRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyLoginRequest.ProtoReflect.Descriptor instead.
+func (*VerifyLoginRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *VerifyLoginRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *VerifyLoginRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+type VerifyLoginResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VerifyLoginResponse) Reset() {
+	*x = VerifyLoginResponse{}
+	mi := &file_auth_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VerifyLoginResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VerifyLoginResponse) ProtoMessage() {}
+
+func (x *VerifyLoginResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VerifyLoginResponse.ProtoReflect.Descriptor instead.
+func (*VerifyLoginResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *VerifyLoginResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
 var File_auth_proto protoreflect.FileDescriptor
 
 const file_auth_proto_rawDesc = "" +
@@ -426,9 +602,8 @@ const file_auth_proto_rawDesc = "" +
 	"\x10RegisterResponse\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"%\n" +
-	"\rLoginResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"'\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"\x1c\n" +
+	"\rLoginResponseJ\x04\b\x01\x10\x02R\x05token\"'\n" +
 	"\x0fValidateRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"+\n" +
 	"\x10ValidateResponse\x12\x17\n" +
@@ -440,10 +615,21 @@ const file_auth_proto_rawDesc = "" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\tR\tcreatedAt2\x85\x02\n" +
+	"created_at\x18\x04 \x01(\tR\tcreatedAt\"F\n" +
+	"\x1aConfirmRegistrationRequest\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"\x1d\n" +
+	"\x1bConfirmRegistrationResponse\">\n" +
+	"\x12VerifyLoginRequest\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"+\n" +
+	"\x13VerifyLoginResponse\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token2\xb1\x03\n" +
 	"\vAuthService\x12?\n" +
-	"\bRegister\x12\x18.auth.v1.RegisterRequest\x1a\x19.auth.v1.RegisterResponse\x126\n" +
-	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x16.auth.v1.LoginResponse\x12?\n" +
+	"\bRegister\x12\x18.auth.v1.RegisterRequest\x1a\x19.auth.v1.RegisterResponse\x12`\n" +
+	"\x13ConfirmRegistration\x12#.auth.v1.ConfirmRegistrationRequest\x1a$.auth.v1.ConfirmRegistrationResponse\x126\n" +
+	"\x05Login\x12\x15.auth.v1.LoginRequest\x1a\x16.auth.v1.LoginResponse\x12H\n" +
+	"\vVerifyLogin\x12\x1b.auth.v1.VerifyLoginRequest\x1a\x1c.auth.v1.VerifyLoginResponse\x12?\n" +
 	"\bValidate\x12\x18.auth.v1.ValidateRequest\x1a\x19.auth.v1.ValidateResponse\x12<\n" +
 	"\aGetUser\x12\x17.auth.v1.GetUserRequest\x1a\x18.auth.v1.GetUserResponseBBZ@github.com/MorozkoArt/CodeCollab/services/auth/pkg/authv1;authv1b\x06proto3"
 
@@ -459,31 +645,39 @@ func file_auth_proto_rawDescGZIP() []byte {
 	return file_auth_proto_rawDescData
 }
 
-var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_auth_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: auth.v1.RegisterRequest
-	(*RegisterResponse)(nil), // 1: auth.v1.RegisterResponse
-	(*LoginRequest)(nil),     // 2: auth.v1.LoginRequest
-	(*LoginResponse)(nil),    // 3: auth.v1.LoginResponse
-	(*ValidateRequest)(nil),  // 4: auth.v1.ValidateRequest
-	(*ValidateResponse)(nil), // 5: auth.v1.ValidateResponse
-	(*GetUserRequest)(nil),   // 6: auth.v1.GetUserRequest
-	(*GetUserResponse)(nil),  // 7: auth.v1.GetUserResponse
+	(*RegisterRequest)(nil),             // 0: auth.v1.RegisterRequest
+	(*RegisterResponse)(nil),            // 1: auth.v1.RegisterResponse
+	(*LoginRequest)(nil),                // 2: auth.v1.LoginRequest
+	(*LoginResponse)(nil),               // 3: auth.v1.LoginResponse
+	(*ValidateRequest)(nil),             // 4: auth.v1.ValidateRequest
+	(*ValidateResponse)(nil),            // 5: auth.v1.ValidateResponse
+	(*GetUserRequest)(nil),              // 6: auth.v1.GetUserRequest
+	(*GetUserResponse)(nil),             // 7: auth.v1.GetUserResponse
+	(*ConfirmRegistrationRequest)(nil),  // 8: auth.v1.ConfirmRegistrationRequest
+	(*ConfirmRegistrationResponse)(nil), // 9: auth.v1.ConfirmRegistrationResponse
+	(*VerifyLoginRequest)(nil),          // 10: auth.v1.VerifyLoginRequest
+	(*VerifyLoginResponse)(nil),         // 11: auth.v1.VerifyLoginResponse
 }
 var file_auth_proto_depIdxs = []int32{
-	0, // 0: auth.v1.AuthService.Register:input_type -> auth.v1.RegisterRequest
-	2, // 1: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
-	4, // 2: auth.v1.AuthService.Validate:input_type -> auth.v1.ValidateRequest
-	6, // 3: auth.v1.AuthService.GetUser:input_type -> auth.v1.GetUserRequest
-	1, // 4: auth.v1.AuthService.Register:output_type -> auth.v1.RegisterResponse
-	3, // 5: auth.v1.AuthService.Login:output_type -> auth.v1.LoginResponse
-	5, // 6: auth.v1.AuthService.Validate:output_type -> auth.v1.ValidateResponse
-	7, // 7: auth.v1.AuthService.GetUser:output_type -> auth.v1.GetUserResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: auth.v1.AuthService.Register:input_type -> auth.v1.RegisterRequest
+	8,  // 1: auth.v1.AuthService.ConfirmRegistration:input_type -> auth.v1.ConfirmRegistrationRequest
+	2,  // 2: auth.v1.AuthService.Login:input_type -> auth.v1.LoginRequest
+	10, // 3: auth.v1.AuthService.VerifyLogin:input_type -> auth.v1.VerifyLoginRequest
+	4,  // 4: auth.v1.AuthService.Validate:input_type -> auth.v1.ValidateRequest
+	6,  // 5: auth.v1.AuthService.GetUser:input_type -> auth.v1.GetUserRequest
+	1,  // 6: auth.v1.AuthService.Register:output_type -> auth.v1.RegisterResponse
+	9,  // 7: auth.v1.AuthService.ConfirmRegistration:output_type -> auth.v1.ConfirmRegistrationResponse
+	3,  // 8: auth.v1.AuthService.Login:output_type -> auth.v1.LoginResponse
+	11, // 9: auth.v1.AuthService.VerifyLogin:output_type -> auth.v1.VerifyLoginResponse
+	5,  // 10: auth.v1.AuthService.Validate:output_type -> auth.v1.ValidateResponse
+	7,  // 11: auth.v1.AuthService.GetUser:output_type -> auth.v1.GetUserResponse
+	6,  // [6:12] is the sub-list for method output_type
+	0,  // [0:6] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_auth_proto_init() }
@@ -497,7 +691,7 @@ func file_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

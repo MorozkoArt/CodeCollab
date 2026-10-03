@@ -27,7 +27,9 @@ import (
 	v1 "github.com/MorozkoArt/CodeCollab/services/auth/internal/api/http/v1"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/app"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/config"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
+	"github.com/MorozkoArt/CodeCollab/services/auth/internal/mailer"
+	codeRepository "github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/code"
+	userRepository "github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -67,9 +69,14 @@ func run() error {
 	}
 	defer dbClient.Close()
 
-	userRepo := user.NewUserRepository(dbClient.SQL(), dbClient.Builder())
+	if len(cfg.Auth.JWTSecret()) < 32 || len(cfg.Auth.OTPSecret()) < 32 {
+		return errors.New("JWT_SECRET and OTP_SECRET must be at least 32 bytes")
+	}
+
+	userRepo := userRepository.NewUserRepository(dbClient.SQL(), dbClient.Builder())
+	codeRepo := codeRepository.NewCodeRepository(dbClient.SQL(), dbClient.Builder())
 	jwtSvc := pkgjwt.NewService(cfg.Auth.JWTSecret(), cfg.Auth.TokenExpiry())
-	authSvc := services.NewAuthService(userRepo, jwtSvc)
+	authSvc := services.NewAuthService(userRepo, codeRepo, jwtSvc, mailer.NewSMTP(cfg.Mail), []byte(cfg.Auth.OTPSecret()))
 
 	httpApp := app.New(cfg.Server, func(r chi.Router) {
 		v1.Register(r, authSvc, jwtSvc)

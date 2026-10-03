@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS email_codes (
     purpose    VARCHAR(16)  NOT NULL CHECK (purpose IN ('register', 'login')),
     code_hash  BYTEA        NOT NULL,
     attempts   INTEGER      NOT NULL DEFAULT 0,
-    expires_at TIMESTAMP(0) NOT NULL,
-    created_at TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_email_codes_user
         FOREIGN KEY (user_id)

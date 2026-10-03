@@ -5,10 +5,12 @@ package auth.v1;
 option go_package = "github.com/MorozkoArt/CodeCollab/services/auth/pkg/authv1;authv1";
 
 service AuthService {
-  rpc Register(RegisterRequest)   returns (RegisterResponse);
-  rpc Login(LoginRequest)         returns (LoginResponse);
-  rpc Validate(ValidateRequest)   returns (ValidateResponse);
-  rpc GetUser(GetUserRequest)     returns (GetUserResponse);
+  rpc Register(RegisterRequest)                         returns (RegisterResponse);
+  rpc ConfirmRegistration(ConfirmRegistrationRequest)   returns (ConfirmRegistrationResponse);
+  rpc Login(LoginRequest)                               returns (LoginResponse);
+  rpc VerifyLogin(VerifyLoginRequest)                   returns (VerifyLoginResponse);
+  rpc Validate(ValidateRequest)                         returns (ValidateResponse);
+  rpc GetUser(GetUserRequest)                           returns (GetUserResponse);
 }
 
 message RegisterRequest {
@@ -25,7 +27,8 @@ message LoginRequest {
 }
 
 message LoginResponse {
-  string token = 1;
+  reserved 1;
+  reserved "token";
 }
 
 message ValidateRequest {
@@ -45,4 +48,20 @@ message GetUserResponse {
   string username   = 2;
   string email      = 3;
   string created_at = 4;
+}
+
+message ConfirmRegistrationRequest  {
+  string email = 1;
+  string code = 2;
+}
+
+message ConfirmRegistrationResponse {}
+
+message VerifyLoginRequest  {
+  string email = 1;
+  string code = 2;
+}
+
+message VerifyLoginResponse {
+  string token = 1;
 }

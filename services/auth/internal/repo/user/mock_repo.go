@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"time"
 
 	"github.com/MorozkoArt/CodeCollab/services/auth/internal/domain"
 	"github.com/stretchr/testify/mock"
@@ -35,4 +36,9 @@ func (m *MockUserRepository) GetByID(ctx context.Context, id int64) (*domain.Use
 		return nil, args.Error(1)
 	}
 	return args.Get(0).(*domain.User), args.Error(1)
+}
+
+func (m *MockUserRepository) MarkEmailVerified(ctx context.Context, id int64, at time.Time) error {
+	args := m.Called(ctx, id, at)
+	return args.Error(0)
 }
