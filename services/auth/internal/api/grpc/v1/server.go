@@ -5,42 +5,64 @@ import (
 
 	"github.com/MorozkoArt/CodeCollab/pkg/grpcerr"
 	pkgjwt "github.com/MorozkoArt/CodeCollab/pkg/jwt"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/repo"
-	"github.com/MorozkoArt/CodeCollab/services/auth/internal/services"
+	userrepo "github.com/MorozkoArt/CodeCollab/services/auth/internal/repo/user"
+	authsvc "github.com/MorozkoArt/CodeCollab/services/auth/internal/services/auth"
+	codesvc "github.com/MorozkoArt/CodeCollab/services/auth/internal/services/code"
 	"github.com/MorozkoArt/CodeCollab/services/auth/pkg/authv1"
 	"google.golang.org/grpc/codes"
 )
 
 type Server struct {
 	authv1.UnimplementedAuthServiceServer
-	authSvc services.AuthService
+	authSvc authsvc.Service
 }
 
-func NewServer(authSvc services.AuthService) *Server {
+func NewServer(authSvc authsvc.Service) *Server {
 	return &Server{authSvc: authSvc}
 }
 
 func (s *Server) Register(ctx context.Context, req *authv1.RegisterRequest) (*authv1.RegisterResponse, error) {
-	if err := s.authSvc.Register(ctx, services.RegisterInput{
+	if err := s.authSvc.Register(ctx, authsvc.RegisterInput{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: req.Password,
 	}); err != nil {
 		return nil, grpcerr.Error(ctx, err, "register",
-			grpcerr.Map(services.ErrUserExists, codes.AlreadyExists, "user already exists"),
+			grpcerr.Map(authsvc.ErrUserExists, codes.AlreadyExists, "user already exists"),
+			grpcerr.Map(codesvc.ErrTooManyRequests, codes.ResourceExhausted, "try again later"),
 		)
 	}
 	return &authv1.RegisterResponse{}, nil
 }
 
-func (s *Server) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.LoginResponse, error) {
-	token, err := s.authSvc.Login(ctx, req.Email, req.Password)
-	if err != nil {
-		return nil, grpcerr.Error(ctx, err, "login",
-			grpcerr.Map(services.ErrInvalidPassword, codes.Unauthenticated, "invalid credentials"),
+func (s *Server) ConfirmRegistration(ctx context.Context, req *authv1.ConfirmRegistrationRequest) (*authv1.ConfirmRegistrationResponse, error) {
+	if err := s.authSvc.ConfirmRegistration(ctx, req.Email, req.Code); err != nil {
+		return nil, grpcerr.Error(ctx, err, "confirm_registration",
+			grpcerr.Map(codesvc.ErrInvalidCode, codes.InvalidArgument, "invalid or expired code"),
 		)
 	}
-	return &authv1.LoginResponse{Token: token}, nil
+	return &authv1.ConfirmRegistrationResponse{}, nil
+}
+
+func (s *Server) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.LoginResponse, error) {
+	if err := s.authSvc.Login(ctx, req.Email, req.Password); err != nil {
+		return nil, grpcerr.Error(ctx, err, "login",
+			grpcerr.Map(authsvc.ErrInvalidPassword, codes.Unauthenticated, "invalid credentials"),
+			grpcerr.Map(authsvc.ErrEmailNotVerified, codes.FailedPrecondition, "email not verified"),
+			grpcerr.Map(codesvc.ErrTooManyRequests, codes.ResourceExhausted, "try again later"),
+		)
+	}
+	return &authv1.LoginResponse{}, nil
+}
+
+func (s *Server) VerifyLogin(ctx context.Context, req *authv1.VerifyLoginRequest) (*authv1.VerifyLoginResponse, error) {
+	token, err := s.authSvc.VerifyLogin(ctx, req.Email, req.Code)
+	if err != nil {
+		return nil, grpcerr.Error(ctx, err, "verify_login",
+			grpcerr.Map(codesvc.ErrInvalidCode, codes.Unauthenticated, "invalid or expired code"),
+		)
+	}
+	return &authv1.VerifyLoginResponse{Token: token}, nil
 }
 
 func (s *Server) Validate(ctx context.Context, req *authv1.ValidateRequest) (*authv1.ValidateResponse, error) {
@@ -54,16 +76,16 @@ func (s *Server) Validate(ctx context.Context, req *authv1.ValidateRequest) (*au
 }
 
 func (s *Server) GetUser(ctx context.Context, req *authv1.GetUserRequest) (*authv1.GetUserResponse, error) {
-	user, err := s.authSvc.GetUser(ctx, req.UserId)
+	u, err := s.authSvc.GetUser(ctx, req.UserId)
 	if err != nil {
 		return nil, grpcerr.Error(ctx, err, "get_user",
-			grpcerr.Map(repo.ErrUserNotFound, codes.NotFound, "user not found"),
+			grpcerr.Map(userrepo.ErrUserNotFound, codes.NotFound, "user not found"),
 		)
 	}
 	return &authv1.GetUserResponse{
-		Id:        user.ID,
-		Username:  user.Username,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt.String(),
+		Id:        u.ID,
+		Username:  u.Username,
+		Email:     u.Email,
+		CreatedAt: u.CreatedAt.String(),
 	}, nil
 }

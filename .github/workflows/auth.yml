@@ -126,7 +126,7 @@ jobs:
       - name: Build & push - ${{ matrix.name }}
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: services/auth
           file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}

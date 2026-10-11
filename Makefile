@@ -17,16 +17,21 @@ endif
 # Dev: поднять всё последовательно
 up:
 	$(MAKE) -C database up
+	$(MAKE) -C mailpit up
 	$(MAKE) -C services/auth up
 	$(MAKE) -C nginx up
 
 down:
 	$(MAKE) -C nginx down
 	$(MAKE) -C services/auth down
+	$(MAKE) -C mailpit down
 	$(MAKE) -C database down
 
 logs-db:
 	$(MAKE) -C database logs
+
+logs-mail:
+	$(MAKE) -C mailpit logs
 
 logs-auth:
 	$(MAKE) -C services/auth logs
@@ -41,20 +46,17 @@ db-up:
 db-down:
 	$(MAKE) -C database down
 
+mail-up:
+	$(MAKE) -C mailpit up
+
+mail-down:
+	$(MAKE) -C mailpit down
+
 auth-up:
 	$(MAKE) -C services/auth up
 
 auth-down:
 	$(MAKE) -C services/auth down
-
-auth-test:
-	$(MAKE) -C services/auth test
-
-auth-lint:
-	$(MAKE) -C services/auth lint
-
-auth-migrate:
-	$(MAKE) -C services/auth m_up
 
 nginx-up:
 	$(MAKE) -C nginx up

@@ -1,0 +1,32 @@
+name: codecollab-mailpit-dev
+
+services:
+  mailpit:
+    build:
+      context: ..
+      dockerfile: mailpit/Dockerfile
+      args:
+        MAILPIT_VERSION: ${MAILPIT_VERSION:-latest}
+    container_name: codecollab-mailpit-dev
+    environment:
+      - MP_SMTP_BIND_ADDR=0.0.0.0:${MAILPIT_SMTP_PORT}
+      - MP_UI_BIND_ADDR=0.0.0.0:${MAILPIT_UI_PORT}
+      - MP_MAX_MESSAGES=${MAILPIT_MAX_MESSAGES}
+      - MP_DATABASE=/data/mailpit.db
+    ports:
+      - "127.0.0.1:${MAILPIT_UI_PORT}:${MAILPIT_UI_PORT}"
+      - "127.0.0.1:${MAILPIT_SMTP_PORT}:${MAILPIT_SMTP_PORT}"
+    volumes:
+      - mailpit_data_dev:/data
+    networks:
+      - codecollab-network
+    restart: unless-stopped
+
+volumes:
+  mailpit_data_dev:
+    name: codecollab-mailpit-dev
+
+networks:
+  codecollab-network:
+    external: true
+    name: codecollab-network

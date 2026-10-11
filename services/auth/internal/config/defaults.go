@@ -1,6 +1,10 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/MorozkoArt/CodeCollab/services/auth/pkg/enum"
+)
 
 const (
 	// Server
@@ -20,5 +24,10 @@ const (
 	defaultTokenExpiry = 24 * time.Hour
 
 	// App
-	defaultAppEnv = "development"
+	defaultAppEnv  = "development"
+	defaultAppName = "CodeCollab"
+
+	// Mail
+	defaultSMTPPort = 587
+	defaultSMTPTLS  = enum.SMTPTLSStartTLS
 )
